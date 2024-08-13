@@ -14,4 +14,4 @@ fi
 LIBS="$(ncurses6-config --libs)"
 OPTS="-fpermissive"
 
-g++ -o my-tty-clock $OPTS -I figlet main.cpp figlet/*.cpp $CURL $LIBS
+g++ -o my-tty-clock $OPTS -I figlet *.cpp figlet/*.cpp $CURL $LIBS
