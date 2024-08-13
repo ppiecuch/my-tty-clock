@@ -1,8 +1,15 @@
 /*
- *  Copyright (C) 2022-2024  The DOSBox Staging Team
+ *  SPDX-License-Identifier: GPL-2.0-or-later
+ *
+ *  Copyright (C) 2024-2024  The DOSBox Staging Team
  */
 
+#include <cstdint>
 #include <string>
+
+#include "unicode.h"
+
+static std::map<uint16_t, code_page_maps_t> per_code_page_mappings = {};
 
 static wide_string dos_to_wide(const std::string& str,
                                const DosStringConvertMode convert_mode,
@@ -37,3 +44,4 @@ static wide_string dos_to_wide(const std::string& str,
 
 	return str_out;
 }
+
