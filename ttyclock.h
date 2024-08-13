@@ -81,7 +81,7 @@ typedef struct
      time_t lt;
 
      /* Clock member */
-     char *meridiem;
+     const char *meridiem;
      WINDOW *framewin;
      WINDOW *datewin;
 
