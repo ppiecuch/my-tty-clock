@@ -38,6 +38,8 @@ int par_easycurl_to_file(char const* srcurl, char const* dstpath);
 // END PUBLIC API
 // -----------------------------------------------------------------------------
 
+#define PAR_EASYCURL_IMPLEMENTATION
+
 #ifdef PAR_EASYCURL_IMPLEMENTATION
 
 #include <string.h>
