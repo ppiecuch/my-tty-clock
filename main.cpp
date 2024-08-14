@@ -4,9 +4,7 @@
 
 #include "ttyclock.h"
 
-#include "figlet_font.h"
 #include "par_easycurl.h"
-#include "unicode.h"
 
 #include <sstream>
 
@@ -483,27 +481,21 @@ void key_event(void) {
 }
 
 void print_banner(const char *line1, const char *line2) {
-	std::ostringstream ss;
-	Figlet::calvins.print(line1, ss);
-
-	wbkgdset(ttyclock.framewin, (COLOR_PAIR(2)));
-	mvwprintw(ttyclock.framewin, 1, 1, "%s", dos_to_uni(ss.str(), DosStringConvertMode::WithControlCodes).c_str());
-	wrefresh(ttyclock.framewin);
+	// FILE *chess = popen("toilet -f smblock \"Let\'s play chess\"! | boxes -d cat -p h8", "r");
+	FILE *logo = popen("toilet -f smblock \"Let\'s play chess\"!", "r");
+	if (logo) {
+		int ch;
+		wmove(ttyclock.framewin, 0, 0);
+		wattron(ttyclock.framewin, COLOR_PAIR(23) | A_BOLD);
+		while ((ch = fgetc(logo)) != EOF)
+			waddch(ttyclock.framewin, ch);
+		wattroff(ttyclock.framewin, COLOR_PAIR(23) | A_BOLD);
+		pclose(logo);
+	}
 }
 
 int main(int argc, char **argv) {
 	int c;
-
-	std::stringstream ss;
-	std::string line;
-	Figlet::calvins.print("TEST 01234565", ss);
-
-	while (std::getline(ss, line, '\n')) {
-		std::string conv = dos_to_utf8(line, DosStringConvertMode::NoSpecialCharacters);
-		std::cout << conv << std::endl;
-	}
-
-	return (0);
 
 	/* Alloc ttyclock */
 	memset(&ttyclock, 0, sizeof(ttyclock_t));
