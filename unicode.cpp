@@ -38,6 +38,8 @@ static const std::deque<std_fs::path> &GetResourceParentPaths() {
 	add_if_exists(std_fs::path("."));
 	constexpr auto resource_dir_name = "resources";
 	add_if_exists(std_fs::path(resource_dir_name));
+	constexpr auto mapping_dir_name = "conv";
+	add_if_exists(std_fs::path(mapping_dir_name));
 
 	return paths;
 }
@@ -2062,8 +2064,7 @@ static void construct_aliases(const uint16_t code_page) {
 	}
 
 	// Construct decomposed aliases
-	construct_decomposed(mappings.aliases_normalized,
-			mappings.aliases_decomposed);
+	construct_decomposed(mappings.aliases_normalized, mappings.aliases_decomposed);
 }
 
 static bool prepare_code_page(const uint16_t code_page) {
@@ -2160,6 +2161,7 @@ std::string dos_to_utf8(const std::string &str, const DosStringConvertMode conve
 static std::wstring dos_to_uni_common(const std::string &str, const DosStringConvertMode convert_mode, const uint16_t code_page) {
 	load_config_if_needed();
 	const auto tmp = dos_to_wide(str, convert_mode, code_page);
+	std::cout << "vector size " << tmp.size() << std::endl;
 	return std::wstring(tmp.begin(), tmp.end());
 }
 

@@ -484,15 +484,26 @@ void key_event(void) {
 
 void print_banner(const char *line1, const char *line2) {
 	std::ostringstream ss;
-	Figlet::calvins.print("Fractions", ss);
+	Figlet::calvins.print(line1, ss);
 
-	wbkgdset(ttyclock.datewin, (COLOR_PAIR(2)));
-	mvwprintw(ttyclock.datewin, (DATEWINH / 2), 1, "%s", dos_to_uni(ss.str(), DosStringConvertMode::WithControlCodes).c_str());
-	wrefresh(ttyclock.datewin);
+	wbkgdset(ttyclock.framewin, (COLOR_PAIR(2)));
+	mvwprintw(ttyclock.framewin, 1, 1, "%s", dos_to_uni(ss.str(), DosStringConvertMode::WithControlCodes).c_str());
+	wrefresh(ttyclock.framewin);
 }
 
 int main(int argc, char **argv) {
 	int c;
+
+	std::stringstream ss;
+	std::string line;
+	Figlet::calvins.print("TEST 01234565", ss);
+
+	while (std::getline(ss, line, '\n')) {
+		std::string conv = dos_to_utf8(line, DosStringConvertMode::NoSpecialCharacters);
+		std::cout << conv << std::endl;
+	}
+
+	return (0);
 
 	/* Alloc ttyclock */
 	memset(&ttyclock, 0, sizeof(ttyclock_t));
@@ -616,6 +627,7 @@ int main(int argc, char **argv) {
 		clock_rebound();
 		update_hour();
 		draw_clock();
+		print_banner("Word in Spanish", "bbb");
 		key_event();
 	}
 
