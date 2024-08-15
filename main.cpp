@@ -11,6 +11,7 @@
 #include "simpleini/SimpleIni.h"
 
 #define WORDSURL "https://raw.githubusercontent.com/ppiecuch/shared-assets/master/words.txt"
+#define LOCALCACHE "/tmp/words-memo.txt"
 #define APPVERSION "0.1"
 
 #define f_ssprintf(...) \
@@ -142,8 +143,8 @@ int main(int argc, char *argv[]) {
 
 		CSimpleIniA ini;
 		ini.SetUnicode(true);
-		if (par_easycurl_to_file(WORDSURL, "/tmp/words-memo.txt")) {
-			SI_Error rc = ini.LoadFile("/tmp/words-memo.txt");
+		if (par_easycurl_to_file(WORDSURL, LOCALCACHE)) {
+			SI_Error rc = ini.LoadFile(LOCALCACHE);
 			if (rc < 0) {
 				fprintf(stderr, "%s: unable to parse words data (error 0x%X)\n", argv[0], rc);
 				return 100;
@@ -197,9 +198,9 @@ int main(int argc, char *argv[]) {
 		caca_blit(cv, 1, fh + 1, figln1, NULL);
 
 		char file_ctime[128] = { 0 };
-		if (file_exists("/tmp/words-memo.txt")) {
+		if (file_exists(LOCALCACHE)) {
 			struct stat attr;
-			stat(path, &attr);
+			stat(LOCALCACHE, &attr);
 			strftime(file_ctime, 128, " | Modification time %d-%m-%y,%H:%M", localtime(&(attrib.st_ctime)));
 		}
 
