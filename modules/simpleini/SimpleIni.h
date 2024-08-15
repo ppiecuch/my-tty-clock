@@ -786,6 +786,10 @@ public:
 	/** @}
 		@{ @name Accessing INI Data */
 
+	/** Return number of sections.
+	 */
+	size_t GetSectionsSize() const;
+
 	/** Retrieve all section names. The list is returned as an STL vector of
 		names and can be iterated or searched as necessary. Note that the
 		sort order of the returned strings is NOT DEFINED. You can sort
