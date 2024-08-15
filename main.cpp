@@ -6,7 +6,9 @@
 #include "caca.h"
 
 #include "par_easycurl.h"
+#include "simpleini/SimpleIni.h"
 
+#define WORDSURL "https://github.com/ppiecuch/shared-assets/blob/master/words.txt"
 #define APPVERSION "0.1"
 
 static void filter_metal(caca_canvas_t *cx, unsigned int lines);
