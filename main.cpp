@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <unistd.h>
 
 #include "caca.h"
 
@@ -44,6 +45,8 @@ static char *get_date(const char *format) {
 	return charTime;
 }
 
+static int file_exists(const char *file) { return (access(file, F_OK) == 0); }
+
 #define create_figfont_canvas(figcv, font)                              \
 	figcv = caca_create_canvas(0, 0);                                   \
 	if (!figcv) {                                                       \
@@ -68,7 +71,9 @@ int main(int argc, char *argv[]) {
 	const char *font = "/usr/share/figlet/mono9.tlf";
 	const char *fontalt = "/usr/share/figlet/smblock.tlf";
 
-	char line1[255], line2[255];
+	char line1[255] = { 0 }, line2[255] = { 0 }; // text to display
+
+	par_easycurl_init(0);
 
 	for (;;) {
 		int option_index = 0;
@@ -127,6 +132,23 @@ int main(int argc, char *argv[]) {
 			if (caca_get_event_type(&ev))
 				goto end;
 		}
+
+		CSimpleIniA ini;
+		ini.SetUnicode(true);
+		if (par_easycurl_to_file(WORDSURL, "/tmp/words-memo.txt")) {
+			SI_Error rc = ini.LoadFile("/tmp/words-memo.txt");
+			if (rc < 0) {
+				fprintf(stderr, "%s: unable to parse words data (error 0x%X)\n", argv[0], rc);
+				return 100;
+			};
+		}
+
+		// get all sections
+		if (ini.GetSectionsSize() > 0) {
+			CSimpleIniA::TNamesDepend sections;
+			ini.GetAllSections(sections);
+		}
+
 		char *d = get_date(format);
 		uint32_t o = 0;
 
