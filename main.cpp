@@ -152,12 +152,6 @@ int main(int argc, char *argv[]) {
 			};
 		}
 
-		// get all sections
-		if (ini.GetSectionsSize() > 0) {
-			CSimpleIniA::TNamesDepend sections;
-			ini.GetAllSections(sections);
-		}
-
 		char *d = get_date(format);
 		uint32_t o = 0;
 
@@ -186,9 +180,23 @@ int main(int argc, char *argv[]) {
 
 		caca_clear_canvas(figln1);
 
-		std::string line1, line2;
+		std::string line1, line2, selection;
 
-		for(const char &c : line1) {
+		if (ini.GetSectionsSize() > 0) {
+			CSimpleIniA::TNamesDepend sections;
+			ini.GetAllSections(sections);
+
+			int sect = 0;
+			int key = rand() % ini.GetSectionsSize(sections[sect]);
+
+			std::string value = ini.GetValue(sections[sect], itoa(key));
+			std::string delimiter = "::";
+			std::string token = s.substr(0, s.find(delimiter)); // token is "scott"
+
+			selection += " | " + sections[sect];
+		}
+
+		for (const char &c : line1) {
 			caca_put_figchar(figln1, c);
 		}
 		caca_flush_figlet(figln1);
@@ -197,7 +205,8 @@ int main(int argc, char *argv[]) {
 		fw = caca_get_canvas_width(figln1);
 		fh = fh + caca_get_canvas_height(figln1);
 
-		caca_blit(cv, 1, fh + 1, figln1, NULL);
+		if (fw && fh)
+			caca_blit(cv, 1, fh + 1, figln1, NULL);
 
 		char file_ctime[128] = { 0 };
 		if (file_exists(LOCALCACHE)) {
