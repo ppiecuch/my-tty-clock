@@ -227,7 +227,7 @@ int main(int argc, char *argv[]) {
 			fw = caca_get_canvas_width(figln2);
 			fh = fh + caca_get_canvas_height(figln2);
 
-			caca_blit(cv, 1, fh + 1, figln1, NULL);
+			caca_blit(cv, 1, fh + 1, figln2, NULL);
 		}
 
 		char file_ctime[128] = { 0 };
