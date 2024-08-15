@@ -38,7 +38,7 @@ static char *get_date(const char *format) {
 	return charTime;
 }
 
-#define create_figfont_canvas(figv, font)                               \
+#define create_figfont_canvas(figcv, font)                              \
 	figcv = caca_create_canvas(0, 0);                                   \
 	if (!figcv) {                                                       \
 		fprintf(stderr, "%s: unable to initialise libcaca\n", argv[0]); \
@@ -147,6 +147,7 @@ int main(int argc, char *argv[]) {
 		caca_blit(cv, x, y, figcv, NULL);
 
 		caca_clear_canvas(figln1);
+		snprintf(line1, 255, "Test 012345");
 		o = 0;
 		while (line1[o]) {
 			caca_put_figchar(figln1, line1[o++]);
