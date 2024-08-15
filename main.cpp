@@ -200,7 +200,7 @@ int main(int argc, char *argv[]) {
 			line1 = s.substr(0, s.find(delimiter));
 			line2 = s.substr(s.find(delimiter) + 2);
 
-			selection += std::string(" | ") + sect;
+			selection = std::string(" | ") + sect;
 		}
 
 		gettimeofday(&t2, NULL);
