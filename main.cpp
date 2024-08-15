@@ -9,7 +9,7 @@
 
 #define APPVERSION "0.1"
 
-static void filter_metal(caca_canvas_t *cx);
+static void filter_metal(caca_canvas_t *cx, unsigned int lines);
 static void filter_rainbow(caca_canvas_t *cx);
 static void filter_border(caca_canvas_t *cx);
 
@@ -179,7 +179,7 @@ end:
 
 // Filter support
 
-static void filter_metal(caca_canvas_t *cx) {
+static void filter_metal(caca_canvas_t *cx, unsigned int lines) {
 	static unsigned char const palette[] = {
 		CACA_LIGHTBLUE,
 		CACA_BLUE,
@@ -197,13 +197,13 @@ static void filter_metal(caca_canvas_t *cx) {
 			if (ch == (unsigned char)' ')
 				continue;
 
-			int i = ((cx->lines + y + x / 8) / 2) % 4;
+			int i = ((lines + y + x / 8) / 2) % 4;
 			caca_set_color_ansi(cx, palette[i], CACA_TRANSPARENT);
 			caca_put_char(cx, x, y, ch);
 		}
 }
 
-static void filter_rainbow(caca_canvas_t *cx) {
+static void filter_rainbow(caca_canvas_t *cx, unsigned int lines) {
 	static unsigned char const rainbow[] = {
 		CACA_LIGHTMAGENTA,
 		CACA_LIGHTRED,
@@ -221,7 +221,7 @@ static void filter_rainbow(caca_canvas_t *cx) {
 			unsigned long int ch = caca_get_char(cx, x, y);
 			if (ch != (unsigned char)' ') {
 				caca_set_color_ansi(cx,
-						rainbow[(x / 2 + y + cx->lines) % 6],
+						rainbow[(x / 2 + y + lines) % 6],
 						CACA_TRANSPARENT);
 				caca_put_char(cx, x, y, ch);
 			}
