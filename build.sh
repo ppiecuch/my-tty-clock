@@ -11,7 +11,7 @@ else
   CURL="-lcurl"
 fi
 
-LIBS="$(ncurses6-config --libs) $(caca-config --libs)"
+LIBS="$(ncurses6-config --libs)"
 OPTS="-I modules"
 
 g++ -g -o my-words-memo $OPTS *.cpp modules/simpleini/ConvertUTF.c $CURL $LIBS
