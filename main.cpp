@@ -7,7 +7,7 @@
 
 #include "par_easycurl.h"
 
-#define CACACLOCKVERSION "0.1"
+#define APPVERSION "0.1"
 
 static void usage(int argc, char **argv) {
 	fprintf(stderr, "Usage: %s [OPTIONS]...\n", argv[0]);
@@ -22,20 +22,15 @@ static void usage(int argc, char **argv) {
 
 static void version(void) {
 	printf(
-			"cacaclock Copyright 2011-2012 Jean-Yves Lamoureux\n"
-			"Internet: <jylam@lnxscene.org> Version: %s (libcaca %s), date: %s\n"
-			"\n"
-			"cacaclock, along with its documentation, may be freely copied and distributed.\n"
-			"\n"
-			"The latest version of cacaclock is available from the web site,\n"
-			"        http://caca.zoy.org/wiki/libcaca in the libcaca package.\n"
+			"words-memo Copyright 2024 Pawel Piecuch\n"
+			"Internet: <piecuch.pawel@gmail.com> Version: %s (libcaca %s), date: %s\n"
 			"\n",
-			CACACLOCKVERSION, caca_get_version(), __DATE__);
+			APPVERSION, caca_get_version(), __DATE__);
 }
 
 static char *get_date(const char *format) {
 	time_t currtime;
-	char *charTime = (char*)malloc(101);
+	char *charTime = (char *)malloc(101);
 
 	time(&currtime);
 	strftime(charTime, 100, format, localtime(&currtime));
@@ -43,14 +38,31 @@ static char *get_date(const char *format) {
 	return charTime;
 }
 
+#define create_figfont_canvas(figv, font)                               \
+	figcv = caca_create_canvas(0, 0);                                   \
+	if (!figcv) {                                                       \
+		fprintf(stderr, "%s: unable to initialise libcaca\n", argv[0]); \
+		return 1;                                                       \
+	}                                                                   \
+                                                                        \
+	if (caca_canvas_set_figfont(figcv, font)) {                         \
+		fprintf(stderr, "Could not open font\n");                       \
+		return -1;                                                      \
+	}                                                                   \
+	caca_clear_canvas(figcv);                                           \
+	caca_set_color_ansi(figcv, CACA_DEFAULT, CACA_DEFAULT);
+
 int main(int argc, char *argv[]) {
 	caca_canvas_t *cv;
-	caca_canvas_t *figcv;
+	caca_canvas_t *figcv, *figln1, *figln2;
 	caca_display_t *dp;
 	uint32_t w, h, fw, fh;
 
 	const char *format = "%R:%S";
-	const char *font = "/usr/share/figlet/mono12.tlf";
+	const char *font = "/usr/share/figlet/mono9.tlf";
+	const char *fontalt = "/usr/share/figlet/smblock.tlf";
+
+	char line1[255], line2[255];
 
 	for (;;) {
 		int option_index = 0;
@@ -60,8 +72,7 @@ int main(int argc, char *argv[]) {
 			{ "help", 0, NULL, 'h' },
 			{ "version", 0, NULL, 'v' },
 		};
-		int c = caca_getopt(argc, argv, "f:d:hv",
-				long_options, &option_index);
+		int c = caca_getopt(argc, argv, "f:d:hv", long_options, &option_index);
 		if (c == -1)
 			break;
 
@@ -87,15 +98,9 @@ int main(int argc, char *argv[]) {
 	}
 
 	cv = caca_create_canvas(0, 0);
-	figcv = caca_create_canvas(0, 0);
 	if (!cv || !figcv) {
 		fprintf(stderr, "%s: unable to initialise libcaca\n", argv[0]);
 		return 1;
-	}
-
-	if (caca_canvas_set_figfont(figcv, font)) {
-		fprintf(stderr, "Could not open font\n");
-		return -1;
 	}
 
 	dp = caca_create_display(cv);
@@ -104,7 +109,10 @@ int main(int argc, char *argv[]) {
 		return -1;
 	}
 
-	caca_set_color_ansi(figcv, CACA_DEFAULT, CACA_DEFAULT);
+	create_figfont_canvas(figcv, font);
+	create_figfont_canvas(figln1, fontalt);
+	create_figfont_canvas(figln2, fontalt);
+
 	caca_clear_canvas(cv);
 	for (;;) {
 		caca_event_t ev;
@@ -134,9 +142,22 @@ int main(int argc, char *argv[]) {
 		fh = caca_get_canvas_height(figcv);
 
 		uint32_t x = (w / 2) - (fw / 2);
-		uint32_t y = (h / 2) - (fh / 2);
+		uint32_t y = 1;
 
 		caca_blit(cv, x, y, figcv, NULL);
+
+		caca_clear_canvas(figln1);
+		o = 0;
+		while (line1[o]) {
+			caca_put_figchar(figln1, line1[o++]);
+		}
+		caca_flush_figlet(figln1);
+
+		fw = caca_get_canvas_width(figln1);
+		fh = fh + caca_get_canvas_height(figln1);
+
+		caca_blit(cv, 1, fh + 1, figln1, NULL);
+
 		caca_refresh_display(dp);
 		usleep(250000);
 	}
