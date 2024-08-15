@@ -79,8 +79,6 @@ int main(int argc, char *argv[]) {
 	const char *font = "/usr/share/figlet/mono9.tlf";
 	const char *fontalt = "/usr/share/figlet/smblock.tlf";
 
-	char line1[255] = { 0 }, line2[255] = { 0 }; // text to display
-
 	par_easycurl_init(0);
 
 	for (;;) {
@@ -133,6 +131,9 @@ int main(int argc, char *argv[]) {
 	create_figfont_canvas(figln2, fontalt);
 
 	caca_clear_canvas(cv);
+
+	srand(time(NULL));
+
 	for (;;) {
 		caca_event_t ev;
 
@@ -184,10 +185,11 @@ int main(int argc, char *argv[]) {
 		caca_blit(cv, x, y, figcv, NULL);
 
 		caca_clear_canvas(figln1);
-		snprintf(line1, 255, "Test 012345");
-		o = 0;
-		while (line1[o]) {
-			caca_put_figchar(figln1, line1[o++]);
+
+		std::string line1, line2;
+
+		for(const char &c : line1) {
+			caca_put_figchar(figln1, c);
 		}
 		caca_flush_figlet(figln1);
 		filter_metal(figln1, 0);
