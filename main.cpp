@@ -658,6 +658,9 @@ int main(int argc, char **argv) {
 		if (elapsedTime > 5 && ini.GetSectionsSize() > 0) {
 			gettimeofday(&t1, NULL); // reset
 
+			CSimpleIniA::TNamesDepend sections;
+			ini.GetAllSections(sections);
+
 			const char *sect = sections.begin()->pItem; // first section
 			int key = rand() % ini.GetSectionSize(sect);
 
