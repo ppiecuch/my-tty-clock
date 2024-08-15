@@ -9,6 +9,10 @@
 
 #define APPVERSION "0.1"
 
+static void filter_metal(context_t *cx);
+static void filter_rainbow(context_t *cx);
+static void filter_border(context_t *cx);
+
 static void usage(int argc, char **argv) {
 	fprintf(stderr, "Usage: %s [OPTIONS]...\n", argv[0]);
 	fprintf(stderr, "Display current time in text mode     (q to quit)\n");
@@ -165,8 +169,74 @@ int main(int argc, char *argv[]) {
 end:
 
 	caca_free_canvas(figcv);
+	caca_free_canvas(figln1);
+	caca_free_canvas(figln2);
 	caca_free_canvas(cv);
 	caca_free_display(dp);
 
 	return 0;
+}
+
+// Filter support
+
+static void filter_metal(context_t *cx) {
+	static unsigned char const palette[] = {
+		CACA_LIGHTBLUE,
+		CACA_BLUE,
+		CACA_LIGHTGRAY,
+		CACA_DARKGRAY,
+	};
+
+	unsigned int x, y, w, h;
+
+	w = caca_get_canvas_width(cx->torender);
+	h = caca_get_canvas_height(cx->torender);
+
+	for (y = 0; y < h; y++)
+		for (x = 0; x < w; x++) {
+			unsigned long int ch = caca_get_char(cx->torender, x, y);
+			int i;
+
+			if (ch == (unsigned char)' ')
+				continue;
+
+			i = ((cx->lines + y + x / 8) / 2) % 4;
+			caca_set_color_ansi(cx->torender, palette[i], CACA_TRANSPARENT);
+			caca_put_char(cx->torender, x, y, ch);
+		}
+}
+
+static void filter_rainbow(context_t *cx) {
+	static unsigned char const rainbow[] = {
+		CACA_LIGHTMAGENTA,
+		CACA_LIGHTRED,
+		CACA_YELLOW,
+		CACA_LIGHTGREEN,
+		CACA_LIGHTCYAN,
+		CACA_LIGHTBLUE,
+	};
+	unsigned int x, y, w, h;
+
+	w = caca_get_canvas_width(cx->torender);
+	h = caca_get_canvas_height(cx->torender);
+
+	for (y = 0; y < h; y++)
+		for (x = 0; x < w; x++) {
+			unsigned long int ch = caca_get_char(cx->torender, x, y);
+			if (ch != (unsigned char)' ') {
+				caca_set_color_ansi(cx->torender,
+						rainbow[(x / 2 + y + cx->lines) % 6],
+						CACA_TRANSPARENT);
+				caca_put_char(cx->torender, x, y, ch);
+			}
+		}
+}
+
+static void filter_border(context_t *cx) {
+	int w = caca_get_canvas_width(cx->torender);
+	int h = caca_get_canvas_height(cx->torender);
+
+	caca_set_canvas_boundaries(cx->torender, -1, -1, w + 2, h + 2);
+
+	caca_draw_cp437_box(cx->torender, 0, 0, w + 2, h + 2);
 }
