@@ -202,7 +202,7 @@ int main(int argc, char *argv[]) {
 			line1 = s.substr(0, s.find(delimiter));
 			line2 = s.substr(s.find(delimiter) + 2);
 
-			selection += " | " + sect;
+			selection += std::string(" | ") + sect;
 		}
 
 		for (const char &c : line1) {
