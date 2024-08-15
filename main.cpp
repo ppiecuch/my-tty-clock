@@ -643,9 +643,9 @@ int main(int argc, char **argv) {
 	WINDOW *status = newwin(1, COLS, LINES - 1, 0);
 	wrefresh(status);
 	/* Create memo win */
-	WINDOW *status = newwin(2, COLS, LINES - 3, 0);
-	wattron(status, A_BLINK);
-	wrefresh(status);
+	WINDOW *memo = newwin(2, COLS, LINES - 3, 0);
+	wattron(memo, A_BLINK);
+	wrefresh(memo);
 
 	while (ttyclock.running) {
 		if (!file_exists(LOCALCACHE)) {
