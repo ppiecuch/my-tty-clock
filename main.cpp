@@ -185,7 +185,7 @@ int main(int argc, char *argv[]) {
 		fh = caca_get_canvas_height(figcv);
 
 		uint32_t x = (w - fw) / 2;
-		uint32_t y = 1;
+		uint32_t y = 0;
 
 		caca_blit(cv, x, y, figcv, NULL);
 
@@ -218,9 +218,10 @@ int main(int argc, char *argv[]) {
 			caca_flush_figlet(figln1);
 
 			fw = caca_get_canvas_width(figln1);
-			fh = fh + caca_get_canvas_height(figln1);
 
-			caca_blit(cv, 1, (fh + 1) / 2, figln1, NULL);
+			caca_blit(cv, 0, (fh + 1) / 2, figln1, NULL);
+
+			fh += caca_get_canvas_height(figln1);
 		}
 
 		if (!line2.empty()) {
@@ -230,9 +231,10 @@ int main(int argc, char *argv[]) {
 			caca_flush_figlet(figln2);
 
 			fw = caca_get_canvas_width(figln2);
-			fh = fh + caca_get_canvas_height(figln2);
 
-			caca_blit(cv, 1, (fh + 1) / 2, figln2, NULL);
+			caca_blit(cv, 0, (fh + 1) / 2, figln2, NULL);
+
+			fh += caca_get_canvas_height(figln2);
 		}
 
 		char file_ctime[128] = { 0 };
