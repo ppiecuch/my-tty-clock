@@ -201,7 +201,7 @@ int main(int argc, char *argv[]) {
 		if (file_exists(LOCALCACHE)) {
 			struct stat attr;
 			stat(LOCALCACHE, &attr);
-			strftime(file_ctime, 128, " | Modification time %d-%m-%y,%H:%M", localtime(&(attrib.st_ctime)));
+			strftime(file_ctime, 128, " | Modification time %d-%m-%y,%H:%M", localtime(&(attr.st_ctime)));
 		}
 
 		caca_put_str(cv, 0, h - 1, f_ssprintf("Version %s | Sections %d%s", APPVERSION, ini.GetSectionsSize(), file_ctime));
