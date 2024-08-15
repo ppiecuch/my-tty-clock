@@ -195,7 +195,14 @@ int main(int argc, char *argv[]) {
 
 		caca_blit(cv, 1, fh + 1, figln1, NULL);
 
-		caca_put_str(cv, 0, h - 1, f_ssprintf("Version %s | Sections %d", APPVERSION, ini.GetSectionsSize()));
+		char file_ctime[128] = { 0 };
+		if (file_exists("/tmp/words-memo.txt")) {
+			struct stat attr;
+			stat(path, &attr);
+			strftime(file_ctime, 128, " | Modification time %d-%m-%y,%H:%M", localtime(&(attrib.st_ctime)));
+		}
+
+		caca_put_str(cv, 0, h - 1, f_ssprintf("Version %s | Sections %d%s", APPVERSION, ini.GetSectionsSize(), file_ctime));
 
 		caca_refresh_display(dp);
 		usleep(250000);
