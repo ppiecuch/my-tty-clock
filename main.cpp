@@ -197,7 +197,7 @@ int main(int argc, char *argv[]) {
 			int sect = 0;
 			int key = rand() % ini.GetSectionsSize(sections.begin()->pItem);
 
-			std::string value = ini.GetValue(sections[sect], itoa(key));
+			std::string value = ini.GetValue(sections[sect], f_ssprintf("%s", key));
 			std::string delimiter = "::";
 			line1 = s.substr(0, s.find(delimiter));
 			line2 = s.substr(s.find(delimiter) + 2);
