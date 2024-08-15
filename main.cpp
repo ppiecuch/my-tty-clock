@@ -195,7 +195,7 @@ int main(int argc, char *argv[]) {
 
 		caca_blit(cv, 1, fh + 1, figln1, NULL);
 
-		caca_put_string(cv, 0, h - 1, f_ssprintf("Ver. %s", APPVERSION));
+		caca_put_str(cv, 0, h - 1, f_ssprintf("Version %s | Sections %d", APPVERSION, ini.GetSectionsSize()));
 
 		caca_refresh_display(dp);
 		usleep(250000);
