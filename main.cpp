@@ -138,6 +138,7 @@ int main(int argc, char *argv[]) {
 			caca_put_figchar(figcv, d[o++]);
 		}
 		caca_flush_figlet(figcv);
+		filter_rainbow(figcv);
 		free(d);
 
 		w = caca_get_canvas_width(cv);
@@ -220,9 +221,7 @@ static void filter_rainbow(caca_canvas_t *cx, unsigned int lines) {
 		for (unsigned int x = 0; x < w; x++) {
 			unsigned long int ch = caca_get_char(cx, x, y);
 			if (ch != (unsigned char)' ') {
-				caca_set_color_ansi(cx,
-						rainbow[(x / 2 + y + lines) % 6],
-						CACA_TRANSPARENT);
+				caca_set_color_ansi(cx, rainbow[(x / 2 + y + lines) % 6], CACA_TRANSPARENT);
 				caca_put_char(cx, x, y, ch);
 			}
 		}
