@@ -135,7 +135,7 @@ int main(int argc, char *argv[]) {
 	srand(time(NULL));
 
 	struct timeval t1, t2;
-	double elapsedTime;
+	double elapsedTime = 9999;
 
 	gettimeofday(&t1, NULL);
 
@@ -185,12 +185,11 @@ int main(int argc, char *argv[]) {
 
 		caca_clear_canvas(figln1);
 
-		gettimeofday(&t2, NULL);
-		elapsedTime = t2.tv_sec - t1.tv_sec;
-
 		std::string line1, line2, selection;
 
-		if (ini.GetSectionsSize() > 0) {
+		if (elapsedTime > 5 && ini.GetSectionsSize() > 0) {
+			gettimeofday(&t1, NULL); // reset
+
 			CSimpleIniA::TNamesDepend sections;
 			ini.GetAllSections(sections);
 
@@ -205,11 +204,14 @@ int main(int argc, char *argv[]) {
 			selection += std::string(" | ") + sect;
 		}
 
+		gettimeofday(&t2, NULL);
+		elapsedTime = t2.tv_sec - t1.tv_sec;
+
 		for (const char &c : line1) {
 			caca_put_figchar(figln1, c);
 		}
 		caca_flush_figlet(figln1);
-		filter_metal(figln1, 0);
+		// filter_metal(figln1, 0);
 
 		fw = caca_get_canvas_width(figln1);
 		fh = fh + caca_get_canvas_height(figln1);
@@ -224,7 +226,7 @@ int main(int argc, char *argv[]) {
 			strftime(file_ctime, 128, " | Modification time %d-%m-%y,%H:%M", localtime(&(attr.st_ctime)));
 		}
 
-		caca_put_str(cv, 0, h - 1, f_ssprintf("Version %s | Sections %d%s", APPVERSION, ini.GetSectionsSize(), file_ctime));
+		caca_put_str(cv, 0, h - 1, f_ssprintf("Version %s | Sections %d%s%s", APPVERSION, ini.GetSectionsSize(), file_ctime, selection.c_str()));
 
 		caca_refresh_display(dp);
 		usleep(250000);
