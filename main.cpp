@@ -74,7 +74,7 @@ int main(int argc, char *argv[]) {
 	caca_canvas_t *cv;
 	caca_canvas_t *figcv, *figln1, *figln2;
 	caca_display_t *dp;
-	uint32_t w, h, fw, fh, refreshrate = 5;
+	uint32_t w, h, fw, fh, refreshrate = 30;
 
 	const char *format = "%R:%S";
 	const char *font = "/usr/share/figlet/mono9.tlf";
