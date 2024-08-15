@@ -200,6 +200,7 @@ int main(int argc, char *argv[]) {
 			std::string value = ini.GetValue(sections[sect], itoa(key));
 			std::string delimiter = "::";
 			line1 = s.substr(0, s.find(delimiter));
+			line2 = s.substr(s.find(delimiter) + 2);
 
 			selection += " | " + sections[sect];
 		}
