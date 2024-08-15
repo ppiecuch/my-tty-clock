@@ -9,7 +9,7 @@
 #include "par_easycurl.h"
 #include "simpleini/SimpleIni.h"
 
-#define WORDSURL "https://github.com/ppiecuch/shared-assets/blob/master/words.txt"
+#define WORDSURL "https://raw.githubusercontent.com/ppiecuch/shared-assets/master/words.txt"
 #define APPVERSION "0.1"
 
 static void filter_metal(caca_canvas_t *cx, unsigned int lines);
@@ -188,6 +188,8 @@ int main(int argc, char *argv[]) {
 		fh = fh + caca_get_canvas_height(figln1);
 
 		caca_blit(cv, 1, fh + 1, figln1, NULL);
+
+		caca_put_string(cv, 0, h - 1, f_ssprintf("Ver. %s", APPVERSION));
 
 		caca_refresh_display(dp);
 		usleep(250000);
