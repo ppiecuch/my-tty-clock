@@ -675,7 +675,7 @@ int main(int argc, char **argv) {
 			line1 = s.substr(0, s.find(delimiter));
 			line2 = s.substr(s.find(delimiter) + 2);
 
-			selection = std::string("|") + sect + std::string("/") + atol(ini.GetSectionsSize());
+			selection = std::string("|") + sect + std::string("/") + itoa(ini.GetSectionsSize());
 		}
 		gettimeofday(&t2, NULL);
 		elapsedTime = t2.tv_sec - t1.tv_sec;
