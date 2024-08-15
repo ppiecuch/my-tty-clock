@@ -19,7 +19,7 @@
 
 #define WORDSURL "https://raw.githubusercontent.com/ppiecuch/shared-assets/master/words.txt"
 #define LOCALCACHE "/tmp/words-memo.txt"
-#define APPVERSION "0.1"
+#define APPVERSION "0.2"
 
 #define f_ssprintf(...) \
 	({ int _ss_size = snprintf(0, 0, ##__VA_ARGS__);    \
@@ -676,7 +676,7 @@ int main(int argc, char **argv) {
 			line1 = s.substr(0, s.find(delimiter));
 			line2 = s.substr(s.find(delimiter) + 2);
 
-			selection = std::string(" | ") + sect;
+			selection = std::string("|") + sect + std::string("/") + atol(ini.GetSectionsSize());
 		}
 		gettimeofday(&t2, NULL);
 		elapsedTime = t2.tv_sec - t1.tv_sec;
@@ -685,9 +685,9 @@ int main(int argc, char **argv) {
 		if (file_exists(LOCALCACHE)) {
 			struct stat attr;
 			stat(LOCALCACHE, &attr);
-			strftime(file_ctime, 128, " | Modification time %d-%m-%y,%H:%M", localtime(&(attr.st_ctime)));
+			strftime(file_ctime, 128, "|Last %d-%m-%y,%H:%M", localtime(&(attr.st_ctime)));
 		}
-		mvwaddstr(status, 0, 0, f_ssprintf("Version %s | Sections %d%s%s", APPVERSION, ini.GetSectionsSize(), file_ctime, selection.c_str()));
+		mvwaddstr(status, 0, 0, f_ssprintf("v%s|%s%s", APPVERSION, file_ctime, selection.c_str()));
 		wrefresh(status);
 		key_event();
 	}
