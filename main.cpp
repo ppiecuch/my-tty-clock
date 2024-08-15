@@ -134,6 +134,11 @@ int main(int argc, char *argv[]) {
 
 	srand(time(NULL));
 
+	struct timeval t1, t2;
+	double elapsedTime;
+
+	gettimeofday(&t1, NULL);
+
 	for (;;) {
 		caca_event_t ev;
 
@@ -180,6 +185,9 @@ int main(int argc, char *argv[]) {
 
 		caca_clear_canvas(figln1);
 
+		gettimeofday(&t2, NULL);
+		elapsedTime = t2.tv_sec - t1.tv_sec;
+
 		std::string line1, line2, selection;
 
 		if (ini.GetSectionsSize() > 0) {
@@ -191,7 +199,7 @@ int main(int argc, char *argv[]) {
 
 			std::string value = ini.GetValue(sections[sect], itoa(key));
 			std::string delimiter = "::";
-			std::string token = s.substr(0, s.find(delimiter)); // token is "scott"
+			line1 = s.substr(0, s.find(delimiter));
 
 			selection += " | " + sections[sect];
 		}
