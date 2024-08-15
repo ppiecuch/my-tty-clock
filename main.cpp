@@ -501,9 +501,6 @@ void key_event(void) {
 
 static int file_exists(const char *file) { return (access(file, F_OK) == 0); }
 
-void print_wordsmemo(const std::string &line1, const std::string &line2) {
-}
-
 int main(int argc, char **argv) {
 	int c;
 	int refreshrate = 30; /* sec */
@@ -644,8 +641,10 @@ int main(int argc, char **argv) {
 
 	/* Create status win */
 	WINDOW *status = newwin(1, COLS, LINES - 1, 0);
+	wrefresh(status);
+	/* Create memo win */
+	WINDOW *status = newwin(2, COLS, LINES - 3, 0);
 	wattron(status, A_BLINK);
-
 	wrefresh(status);
 
 	while (ttyclock.running) {
@@ -680,7 +679,11 @@ int main(int argc, char **argv) {
 		}
 		gettimeofday(&t2, NULL);
 		elapsedTime = t2.tv_sec - t1.tv_sec;
-		print_wordsmemo(line1, line2);
+		if (!line1.empty() && !line2.empty()) {
+			mvwaddstr(memo, 0, 0, line1.c_str());
+			mvwaddstr(memo, 0, 1, line2.c_str());
+			wrefresh(memo);
+		}
 		char file_ctime[128] = { 0 };
 		if (file_exists(LOCALCACHE)) {
 			struct stat attr;
