@@ -12,6 +12,6 @@ else
 fi
 
 LIBS="$(ncurses6-config --libs)"
-OPTS="-std=c++17 -fpermissive -Wno-deprecated"
+OPTS=""
 
-g++ -o my-tty-clock $OPTS -I figlet *.cpp figlet/*.cpp ttydraw/*.c $CURL $LIBS
+g++ -o my-tty-clock $OPTS *.cpp $CURL $LIBS
