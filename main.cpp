@@ -108,7 +108,7 @@ int main(int argc, char *argv[]) {
 				font = caca_optarg;
 				break;
 			case 'r': /* --refreshrate       */
-				refreshrate = caca_optarg;
+				refreshrate = atoi(caca_optarg);
 				break;
 			case 'd': /* --dateformat */
 				format = caca_optarg;
