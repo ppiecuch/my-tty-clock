@@ -643,7 +643,7 @@ int main(int argc, char **argv) {
 	attron(A_BLINK);
 
 	/* Create status win */
-	WINDOW *status = newwin(1, COLS, 0, LINES - 1);
+	WINDOW *status = newwin(1, COLS, LINES - 1, 0);
 	wattron(status, A_BLINK);
 
 	wrefresh(status);
