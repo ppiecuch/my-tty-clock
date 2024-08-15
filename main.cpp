@@ -139,6 +139,7 @@ int main(int argc, char *argv[]) {
 
 	gettimeofday(&t1, NULL);
 
+	std::string line1, line2, selection;
 	for (;;) {
 		caca_event_t ev;
 
@@ -185,8 +186,6 @@ int main(int argc, char *argv[]) {
 
 		caca_clear_canvas(figln1);
 
-		std::string line1, line2, selection;
-
 		if (elapsedTime > 5 && ini.GetSectionsSize() > 0) {
 			gettimeofday(&t1, NULL); // reset
 
@@ -207,17 +206,18 @@ int main(int argc, char *argv[]) {
 		gettimeofday(&t2, NULL);
 		elapsedTime = t2.tv_sec - t1.tv_sec;
 
-		for (const char &c : line1) {
-			caca_put_figchar(figln1, c);
-		}
-		caca_flush_figlet(figln1);
-		// filter_metal(figln1, 0);
+		if (!line1.empty()) {
+			for (const char &c : line1) {
+				caca_put_figchar(figln1, c);
+			}
+			caca_flush_figlet(figln1);
+			// filter_metal(figln1, 0);
 
-		fw = caca_get_canvas_width(figln1);
-		fh = fh + caca_get_canvas_height(figln1);
+			fw = caca_get_canvas_width(figln1);
+			fh = fh + caca_get_canvas_height(figln1);
 
-		if (fw && fh)
 			caca_blit(cv, 1, fh + 1, figln1, NULL);
+		}
 
 		char file_ctime[128] = { 0 };
 		if (file_exists(LOCALCACHE)) {
