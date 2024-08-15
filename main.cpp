@@ -9,9 +9,9 @@
 
 #define APPVERSION "0.1"
 
-static void filter_metal(context_t *cx);
-static void filter_rainbow(context_t *cx);
-static void filter_border(context_t *cx);
+static void filter_metal(caca_canvas_t *cx);
+static void filter_rainbow(caca_canvas_t *cx);
+static void filter_border(caca_canvas_t *cx);
 
 static void usage(int argc, char **argv) {
 	fprintf(stderr, "Usage: %s [OPTIONS]...\n", argv[0]);
@@ -179,7 +179,7 @@ end:
 
 // Filter support
 
-static void filter_metal(context_t *cx) {
+static void filter_metal(caca_canvas_t *cx) {
 	static unsigned char const palette[] = {
 		CACA_LIGHTBLUE,
 		CACA_BLUE,
@@ -187,26 +187,23 @@ static void filter_metal(context_t *cx) {
 		CACA_DARKGRAY,
 	};
 
-	unsigned int x, y, w, h;
+	unsigned int w = caca_get_canvas_width(cx);
+	unsigned int h = caca_get_canvas_height(cx);
 
-	w = caca_get_canvas_width(cx->torender);
-	h = caca_get_canvas_height(cx->torender);
-
-	for (y = 0; y < h; y++)
-		for (x = 0; x < w; x++) {
-			unsigned long int ch = caca_get_char(cx->torender, x, y);
-			int i;
+	for (unsigned int y = 0; y < h; y++)
+		for (unsigned int x = 0; x < w; x++) {
+			unsigned long int ch = caca_get_char(cx, x, y);
 
 			if (ch == (unsigned char)' ')
 				continue;
 
-			i = ((cx->lines + y + x / 8) / 2) % 4;
-			caca_set_color_ansi(cx->torender, palette[i], CACA_TRANSPARENT);
-			caca_put_char(cx->torender, x, y, ch);
+			int i = ((cx->lines + y + x / 8) / 2) % 4;
+			caca_set_color_ansi(cx, palette[i], CACA_TRANSPARENT);
+			caca_put_char(cx, x, y, ch);
 		}
 }
 
-static void filter_rainbow(context_t *cx) {
+static void filter_rainbow(caca_canvas_t *cx) {
 	static unsigned char const rainbow[] = {
 		CACA_LIGHTMAGENTA,
 		CACA_LIGHTRED,
@@ -215,28 +212,26 @@ static void filter_rainbow(context_t *cx) {
 		CACA_LIGHTCYAN,
 		CACA_LIGHTBLUE,
 	};
-	unsigned int x, y, w, h;
 
-	w = caca_get_canvas_width(cx->torender);
-	h = caca_get_canvas_height(cx->torender);
+	unsigned int w = caca_get_canvas_width(cx);
+	unsigned int h = caca_get_canvas_height(cx);
 
-	for (y = 0; y < h; y++)
-		for (x = 0; x < w; x++) {
-			unsigned long int ch = caca_get_char(cx->torender, x, y);
+	for (unsigned int y = 0; y < h; y++)
+		for (unsigned int x = 0; x < w; x++) {
+			unsigned long int ch = caca_get_char(cx, x, y);
 			if (ch != (unsigned char)' ') {
-				caca_set_color_ansi(cx->torender,
+				caca_set_color_ansi(cx,
 						rainbow[(x / 2 + y + cx->lines) % 6],
 						CACA_TRANSPARENT);
-				caca_put_char(cx->torender, x, y, ch);
+				caca_put_char(cx, x, y, ch);
 			}
 		}
 }
 
-static void filter_border(context_t *cx) {
-	int w = caca_get_canvas_width(cx->torender);
-	int h = caca_get_canvas_height(cx->torender);
+static void filter_border(caca_canvas_t *cx) {
+	int w = caca_get_canvas_width(cx);
+	int h = caca_get_canvas_height(cx);
 
-	caca_set_canvas_boundaries(cx->torender, -1, -1, w + 2, h + 2);
-
-	caca_draw_cp437_box(cx->torender, 0, 0, w + 2, h + 2);
+	caca_set_canvas_boundaries(cx, -1, -1, w + 2, h + 2);
+	caca_draw_cp437_box(cx, 0, 0, w + 2, h + 2);
 }
