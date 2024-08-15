@@ -550,13 +550,14 @@ int main(int argc, char **argv) {
 				break;
 			case 'i':
 				puts("TTY-Clock 2 © by Martin Duquesnoy (xorg62@gmail.com), Grey (grey@greytheory.net)");
+				puts("Words-Memo © by Pawel Piecuch (piecuch.pawel@gmail.com)");
 				exit(EXIT_SUCCESS);
 				break;
 			case 'u':
 				ttyclock.option.utc = true;
 				break;
 			case 'v':
-				puts("TTY-Clock 2 © devel version");
+				puts("Words-Memo © devel version");
 				exit(EXIT_SUCCESS);
 				break;
 			case 's':
@@ -612,8 +613,7 @@ int main(int argc, char **argv) {
 							optarg, strerror(errno));
 					exit(EXIT_FAILURE);
 				} else if (!S_ISCHR(sbuf.st_mode)) {
-					fprintf(stderr, "words-memo: error: '%s' doesn't appear to be a character device.\n",
-							optarg);
+					fprintf(stderr, "words-memo: error: '%s' doesn't appear to be a character device.\n", optarg);
 					exit(EXIT_FAILURE);
 				} else {
 					free(ttyclock.tty);
