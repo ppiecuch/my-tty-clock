@@ -646,7 +646,7 @@ int main(int argc, char **argv) {
 	WINDOW *status = newwin(1, COLS, 0, LINES - 1);
 	wattron(status, A_BLINK);
 
-	wrefresh(ttyclock.framewin);
+	wrefresh(status);
 
 	while (ttyclock.running) {
 		if (!file_exists(LOCALCACHE)) {
@@ -688,6 +688,7 @@ int main(int argc, char **argv) {
 			strftime(file_ctime, 128, " | Modification time %d-%m-%y,%H:%M", localtime(&(attr.st_ctime)));
 		}
 		mvwaddstr(status, 0, 0, f_ssprintf("Version %s | Sections %d%s%s", APPVERSION, ini.GetSectionsSize(), file_ctime, selection.c_str()));
+		wrefresh(status);
 		key_event();
 	}
 
