@@ -648,7 +648,7 @@ int main(int argc, char **argv) {
 	wrefresh(memo);
 
 	while (ttyclock.running) {
-		if (!file_exists(LOCALCACHE)) {
+		if (!file_exists(LOCALCACHE) || ini.GetSectionsSize() == 0) {
 			if (par_easycurl_to_file(WORDSURL, LOCALCACHE)) {
 				SI_Error rc = ini.LoadFile(LOCALCACHE);
 				if (rc < 0) {
@@ -660,7 +660,6 @@ int main(int argc, char **argv) {
 		clock_rebound();
 		update_hour();
 		draw_clock();
-
 		if (elapsedTime > 5 && ini.GetSectionsSize() > 0) {
 			gettimeofday(&t1, NULL); // reset
 
