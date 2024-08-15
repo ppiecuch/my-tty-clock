@@ -1,631 +1,181 @@
 /*
- *      MY-TTY-CLOCK Main file.
+ *  cacaclock     Text-mode clock display
+ *  Copyright (c) 2011-2012 Jean-Yves Lamoureux <jylam@lnxscene.org>
+ *                All Rights Reserved
+ *
+ *  This program is free software. It comes without any warranty, to
+ *  the extent permitted by applicable law. You can redistribute it
+ *  and/or modify it under the terms of the Do What the Fuck You Want
+ *  to Public License, Version 2, as published by Sam Hocevar. See
+ *  http://www.wtfpl.net/ for more details.
  */
 
-#include "ttyclock.h"
+#include "config.h"
 
-#include "par_easycurl.h"
+#if !defined(__KERNEL__)
+#   include <time.h>
+#   include <stdio.h>
+#   include <string.h>
+#   include <stdlib.h>
+#endif
 
-#include <sstream>
+#include "caca.h"
 
-void init(void) {
-	struct sigaction sig;
-	setlocale(LC_TIME, "");
+#define CACACLOCKVERSION "0.1"
 
-	ttyclock.bg = COLOR_BLACK;
-
-	/* Init ncurses */
-	if (ttyclock.tty) {
-		FILE *ftty = fopen(ttyclock.tty, "r+");
-		if (!ftty) {
-			fprintf(stderr, "my-tty-clock: error: '%s' couldn't be opened: %s.\n", ttyclock.tty, strerror(errno));
-			exit(EXIT_FAILURE);
-		}
-		ttyclock.ttyscr = newterm(NULL, ftty, ftty);
-		assert(ttyclock.ttyscr != NULL);
-		set_term(ttyclock.ttyscr);
-	} else
-		initscr();
-
-	cbreak();
-	noecho();
-	keypad(stdscr, true);
-	start_color();
-	curs_set(false);
-	clear();
-
-	/* Init default terminal color */
-	if (use_default_colors() == OK)
-		ttyclock.bg = -1;
-
-	/* Init color pair */
-	init_pair(0, ttyclock.bg, ttyclock.bg);
-	init_pair(1, ttyclock.bg, ttyclock.option.color);
-	init_pair(2, ttyclock.option.color, ttyclock.bg);
-	// init_pair(0, ttyclock.bg, ttyclock.bg);
-	// init_pair(1, ttyclock.bg, ttyclock.option.color);
-	// init_pair(2, ttyclock.option.color, ttyclock.bg);
-	refresh();
-
-	/* Init signal handler */
-	sig.sa_handler = signal_handler;
-	sig.sa_flags = 0;
-	sigaction(SIGTERM, &sig, NULL);
-	sigaction(SIGINT, &sig, NULL);
-	sigaction(SIGSEGV, &sig, NULL);
-
-	/* Init global struct */
-	ttyclock.running = true;
-	if (!ttyclock.geo.x)
-		ttyclock.geo.x = 0;
-	if (!ttyclock.geo.y)
-		ttyclock.geo.y = 0;
-	if (!ttyclock.geo.a)
-		ttyclock.geo.a = 1;
-	if (!ttyclock.geo.b)
-		ttyclock.geo.b = 1;
-	ttyclock.geo.w = (ttyclock.option.second) ? SECFRAMEW : NORMFRAMEW;
-	ttyclock.geo.h = 7;
-	ttyclock.tm = localtime(&(ttyclock.lt));
-	if (ttyclock.option.utc) {
-		ttyclock.tm = gmtime(&(ttyclock.lt));
-	}
-	ttyclock.lt = time(NULL);
-	update_hour();
-
-	/* Create clock win */
-	ttyclock.framewin = newwin(ttyclock.geo.h,
-			ttyclock.geo.w,
-			ttyclock.geo.x,
-			ttyclock.geo.y);
-	if (ttyclock.option.box) {
-		box(ttyclock.framewin, 0, 0);
-	}
-
-	if (ttyclock.option.bold) {
-		wattron(ttyclock.framewin, A_BLINK);
-	}
-
-	/* Create the date win */
-	ttyclock.datewin = newwin(DATEWINH, strlen(ttyclock.date.datestr) + 2,
-			ttyclock.geo.x + ttyclock.geo.h - 1,
-			ttyclock.geo.y + (ttyclock.geo.w / 2) -
-					(strlen(ttyclock.date.datestr) / 2) - 1);
-	if (ttyclock.option.box && ttyclock.option.date) {
-		box(ttyclock.datewin, 0, 0);
-	}
-	clearok(ttyclock.datewin, true);
-
-	set_center(ttyclock.option.center);
-
-	nodelay(stdscr, true);
-
-	if (ttyclock.option.date) {
-		wrefresh(ttyclock.datewin);
-	}
-
-	wrefresh(ttyclock.framewin);
-
-	return;
+static void usage(int argc, char **argv)
+{
+    fprintf(stderr, "Usage: %s [OPTIONS]...\n", argv[0]);
+    fprintf(stderr, "Display current time in text mode     (q to quit)\n");
+    fprintf(stderr, "Example : %s -d '%%R'\n\n", argv[0]);
+    fprintf(stderr, "Options:\n");
+    fprintf(stderr, "  -h, --help\t\t\tThis help\n");
+    fprintf(stderr, "  -v, --version\t\t\tVersion of the program\n");
+    fprintf(stderr, "  -f, --font=FONT\t\tUse FONT for time display\n");
+    fprintf(stderr, "  -d, --dateformat=FORMAT\tUse FORMAT as strftime argument (default %%R:%%S)\n");
 }
 
-void signal_handler(int signal) {
-	switch (signal) {
-		case SIGINT:
-		case SIGTERM:
-			ttyclock.running = false;
-			break;
-			/* Segmentation fault signal */
-		case SIGSEGV:
-			endwin();
-			fprintf(stderr, "Segmentation fault.\n");
-			exit(EXIT_FAILURE);
-			break;
-	}
 
-	return;
+static void version(void)
+{
+    printf(
+            "cacaclock Copyright 2011-2012 Jean-Yves Lamoureux\n"
+            "Internet: <jylam@lnxscene.org> Version: %s (libcaca %s), date: %s\n"
+            "\n"
+            "cacaclock, along with its documentation, may be freely copied and distributed.\n"
+            "\n"
+            "The latest version of cacaclock is available from the web site,\n"
+            "        http://caca.zoy.org/wiki/libcaca in the libcaca package.\n"
+            "\n",
+            CACACLOCKVERSION, caca_get_version(), __DATE__);
 }
 
-void cleanup(void) {
-	if (ttyclock.ttyscr)
-		delscreen(ttyclock.ttyscr);
 
-	free(ttyclock.tty);
+static char* get_date(char *format) {
+    time_t  currtime;
+    char *charTime = malloc(101);
+
+    time(&currtime);
+    strftime(charTime, 100,format,localtime(&currtime));
+
+    return charTime;
 }
 
-void update_hour(void) {
-	int ihour;
-	char tmpstr[128];
+int main(int argc, char *argv[]) {
 
-	ttyclock.lt = time(NULL);
-	ttyclock.tm = localtime(&(ttyclock.lt));
-	if (ttyclock.option.utc) {
-		ttyclock.tm = gmtime(&(ttyclock.lt));
-	}
+    caca_canvas_t *cv;
+    caca_canvas_t *figcv;
+    caca_display_t *dp;
+    uint32_t w, h, fw, fh;
 
-	ihour = ttyclock.tm->tm_hour;
+    char *format = "%R:%S";
+    char *font   = "/usr/share/figlet/mono12.tlf";
 
-	if (ttyclock.option.twelve)
-		ttyclock.meridiem = ((ihour >= 12) ? PMSIGN : AMSIGN);
-	else
-		ttyclock.meridiem = "\0";
 
-	/* Manage hour for twelve mode */
-	ihour = ((ttyclock.option.twelve && ihour > 12) ? (ihour - 12) : ihour);
-	ihour = ((ttyclock.option.twelve && !ihour) ? 12 : ihour);
+    for(;;)
+    {
+        int option_index = 0;
+        static struct caca_option long_options[] =
+        {
+            { "font",        1, NULL, 'f' },
+            { "dateformat",  1, NULL, 'd' },
+            { "help",        0, NULL, 'h' },
+            { "version",     0, NULL, 'v' },
+        };
+        int c = caca_getopt(argc, argv, "f:d:hv",
+                long_options, &option_index);
+        if(c == -1)
+            break;
 
-	/* Set hour */
-	ttyclock.date.hour[0] = ihour / 10;
-	ttyclock.date.hour[1] = ihour % 10;
+        switch(c)
+        {
+            case 'h': /* --help       */
+                usage(argc, argv);
+                return 0;
+                break;
+            case 'v': /* --version    */
+                version();
+                return 0;
+                break;
+            case 'f': /* --font       */
+                font = caca_optarg;
+                break;
+            case 'd': /* --dateformat */
+                format = caca_optarg;
+                break;
+            default:
+                return 1;
+                break;
+        }
+    }
 
-	/* Set minutes */
-	ttyclock.date.minute[0] = ttyclock.tm->tm_min / 10;
-	ttyclock.date.minute[1] = ttyclock.tm->tm_min % 10;
 
-	/* Set date string */
-	strcpy(ttyclock.date.old_datestr, ttyclock.date.datestr);
-	strftime(tmpstr,
-			sizeof(tmpstr),
-			ttyclock.option.format,
-			ttyclock.tm);
-	snprintf(ttyclock.date.datestr, 256, "%s%s", tmpstr, ttyclock.meridiem);
 
-	/* Set seconds */
-	ttyclock.date.second[0] = ttyclock.tm->tm_sec / 10;
-	ttyclock.date.second[1] = ttyclock.tm->tm_sec % 10;
+    cv = caca_create_canvas(0, 0);
+    figcv = caca_create_canvas(0, 0);
+    if(!cv || !figcv)
+    {
+        fprintf(stderr, "%s: unable to initialise libcaca\n", argv[0]);
+        return 1;
+    }
 
-	return;
+    if(caca_canvas_set_figfont(figcv, font))
+    {
+        fprintf(stderr, "Could not open font\n");
+        return -1;
+    }
+
+
+    dp = caca_create_display(cv);
+    if(!dp) {
+        printf("Can't open window. CACA_DRIVER problem ?\n");
+        return -1;
+    }
+
+    caca_set_color_ansi(figcv, CACA_DEFAULT, CACA_DEFAULT);
+    caca_clear_canvas(cv);
+    for(;;) {
+        caca_event_t ev;
+
+        while(caca_get_event(dp, CACA_EVENT_KEY_PRESS
+                    | CACA_EVENT_QUIT, &ev, 1))
+        {
+            if(caca_get_event_type(&ev))
+                goto end;
+        }
+        char *d = get_date(format);
+        uint32_t o = 0;
+
+        // figfont API is not complete, and does not allow us to put a string
+        // at another position than 0,0
+        // So, we have to create a canvas which will hold the figfont string,
+        // then blit this canvas to the main one at the desired position.
+        caca_clear_canvas(cv);
+        caca_clear_canvas(figcv);
+        while(d[o])
+        {
+            caca_put_figchar(figcv, d[o++]);
+        }
+        caca_flush_figlet (figcv);
+        free(d);
+
+        w = caca_get_canvas_width (cv);
+        h = caca_get_canvas_height(cv);
+        fw = caca_get_canvas_width (figcv);
+        fh = caca_get_canvas_height(figcv);
+
+        uint32_t x = (w/2) - (fw/2);
+        uint32_t y = (h/2) - (fh/2);
+
+        caca_blit(cv, x, y, figcv, NULL);
+        caca_refresh_display(dp);
+        usleep(250000);
+    }
+end:
+
+    caca_free_canvas(figcv);
+    caca_free_canvas(cv);
+    caca_free_display(dp);
+
+    return 0;
 }
-
-void draw_number(int n, int x, int y) {
-	int sy = y;
-
-	for (int i = 0; i < 30; ++i, ++sy) {
-		if (sy == y + 6) {
-			sy = y;
-			++x;
-		}
-
-		if (ttyclock.option.bold)
-			wattron(ttyclock.framewin, A_BLINK);
-		else
-			wattroff(ttyclock.framewin, A_BLINK);
-
-		wbkgdset(ttyclock.framewin, COLOR_PAIR(number[n][i / 2]));
-		mvwaddch(ttyclock.framewin, x, sy, ' ');
-	}
-	wrefresh(ttyclock.framewin);
-
-	return;
-}
-
-void draw_clock(void) {
-	if (ttyclock.option.date && !ttyclock.option.rebound &&
-			strcmp(ttyclock.date.datestr, ttyclock.date.old_datestr) != 0) {
-		clock_move(ttyclock.geo.x,
-				ttyclock.geo.y,
-				ttyclock.geo.w,
-				ttyclock.geo.h);
-	}
-
-	/* Draw hour numbers */
-	draw_number(ttyclock.date.hour[0], 1, 1);
-	draw_number(ttyclock.date.hour[1], 1, 8);
-	chtype dotcolor = COLOR_PAIR(1);
-	if (ttyclock.option.blink && time(NULL) % 2 == 0)
-		dotcolor = COLOR_PAIR(2);
-
-	/* 2 dot for number separation */
-	wbkgdset(ttyclock.framewin, dotcolor);
-	mvwaddstr(ttyclock.framewin, 2, 16, "  ");
-	mvwaddstr(ttyclock.framewin, 4, 16, "  ");
-
-	/* Draw minute numbers */
-	draw_number(ttyclock.date.minute[0], 1, 20);
-	draw_number(ttyclock.date.minute[1], 1, 27);
-
-	/* Draw the date */
-	if (ttyclock.option.bold)
-		wattron(ttyclock.datewin, A_BOLD);
-	else
-		wattroff(ttyclock.datewin, A_BOLD);
-
-	if (ttyclock.option.date) {
-		wbkgdset(ttyclock.datewin, (COLOR_PAIR(2)));
-		mvwprintw(ttyclock.datewin, (DATEWINH / 2), 1, "%s", ttyclock.date.datestr);
-		wrefresh(ttyclock.datewin);
-	}
-
-	/* Draw second if the option is enabled */
-	if (ttyclock.option.second) {
-		/* Again 2 dot for number separation */
-		wbkgdset(ttyclock.framewin, dotcolor);
-		mvwaddstr(ttyclock.framewin, 2, NORMFRAMEW, "  ");
-		mvwaddstr(ttyclock.framewin, 4, NORMFRAMEW, "  ");
-
-		/* Draw second numbers */
-		draw_number(ttyclock.date.second[0], 1, 39);
-		draw_number(ttyclock.date.second[1], 1, 46);
-	}
-
-	return;
-}
-
-void clock_move(int x, int y, int w, int h) {
-	/* Erase border for a clean move */
-	wbkgdset(ttyclock.framewin, COLOR_PAIR(0));
-	wborder(ttyclock.framewin, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ');
-	werase(ttyclock.framewin);
-	wrefresh(ttyclock.framewin);
-
-	if (ttyclock.option.date) {
-		wbkgdset(ttyclock.datewin, COLOR_PAIR(0));
-		wborder(ttyclock.datewin, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ');
-		werase(ttyclock.datewin);
-		wrefresh(ttyclock.datewin);
-	}
-
-	/* Frame win move */
-	mvwin(ttyclock.framewin, (ttyclock.geo.x = x), (ttyclock.geo.y = y));
-	wresize(ttyclock.framewin, (ttyclock.geo.h = h), (ttyclock.geo.w = w));
-
-	/* Date win move */
-	if (ttyclock.option.date) {
-		mvwin(ttyclock.datewin,
-				ttyclock.geo.x + ttyclock.geo.h - 1,
-				ttyclock.geo.y + (ttyclock.geo.w / 2) - (strlen(ttyclock.date.datestr) / 2) - 1);
-		wresize(ttyclock.datewin, DATEWINH, strlen(ttyclock.date.datestr) + 2);
-
-		if (ttyclock.option.box) {
-			box(ttyclock.datewin, 0, 0);
-		}
-	}
-
-	if (ttyclock.option.box) {
-		box(ttyclock.framewin, 0, 0);
-	}
-
-	wrefresh(ttyclock.framewin);
-	wrefresh(ttyclock.datewin);
-	return;
-}
-
-/* Useless but fun :) */
-void clock_rebound(void) {
-	if (!ttyclock.option.rebound)
-		return;
-
-	if (ttyclock.geo.x < 1)
-		ttyclock.geo.a = 1;
-	if (ttyclock.geo.x > (LINES - ttyclock.geo.h - DATEWINH))
-		ttyclock.geo.a = -1;
-	if (ttyclock.geo.y < 1)
-		ttyclock.geo.b = 1;
-	if (ttyclock.geo.y > (COLS - ttyclock.geo.w - 1))
-		ttyclock.geo.b = -1;
-
-	clock_move(ttyclock.geo.x + ttyclock.geo.a,
-			ttyclock.geo.y + ttyclock.geo.b,
-			ttyclock.geo.w,
-			ttyclock.geo.h);
-
-	return;
-}
-
-void set_second(void) {
-	int new_w = (((ttyclock.option.second = !ttyclock.option.second)) ? SECFRAMEW : NORMFRAMEW);
-	int y_adj;
-
-	for (y_adj = 0; (ttyclock.geo.y - y_adj) > (COLS - new_w - 1); ++y_adj)
-		;
-
-	clock_move(ttyclock.geo.x, (ttyclock.geo.y - y_adj), new_w, ttyclock.geo.h);
-
-	set_center(ttyclock.option.center);
-
-	return;
-}
-
-void set_center(bool b) {
-	if ((ttyclock.option.center = b)) {
-		ttyclock.option.rebound = false;
-
-		clock_move((LINES / 2 - (ttyclock.geo.h / 2)),
-				(COLS / 2 - (ttyclock.geo.w / 2)),
-				ttyclock.geo.w,
-				ttyclock.geo.h);
-	}
-
-	return;
-}
-
-void set_box(bool b) {
-	ttyclock.option.box = b;
-
-	wbkgdset(ttyclock.framewin, COLOR_PAIR(0));
-	wbkgdset(ttyclock.datewin, COLOR_PAIR(0));
-
-	if (ttyclock.option.box) {
-		wbkgdset(ttyclock.framewin, COLOR_PAIR(0));
-		wbkgdset(ttyclock.datewin, COLOR_PAIR(0));
-		box(ttyclock.framewin, 0, 0);
-		box(ttyclock.datewin, 0, 0);
-	} else {
-		wborder(ttyclock.framewin, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ');
-		wborder(ttyclock.datewin, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ');
-	}
-
-	wrefresh(ttyclock.datewin);
-	wrefresh(ttyclock.framewin);
-}
-
-void key_event(void) {
-	int i, c;
-
-	struct timespec length = { ttyclock.option.delay, ttyclock.option.nsdelay };
-
-	fd_set rfds;
-	FD_ZERO(&rfds);
-	FD_SET(STDIN_FILENO, &rfds);
-
-	if (ttyclock.option.screensaver) {
-		c = wgetch(stdscr);
-		if (c != ERR && ttyclock.option.noquit == false) {
-			ttyclock.running = false;
-		} else {
-			nanosleep(&length, NULL);
-			for (i = 0; i < 8; ++i)
-				if (c == (i + '0')) {
-					ttyclock.option.color = i;
-					init_pair(1, ttyclock.bg, i);
-					init_pair(2, i, ttyclock.bg);
-				}
-		}
-		return;
-	}
-
-	switch (c = wgetch(stdscr)) {
-		case KEY_RESIZE:
-			endwin();
-			init();
-			break;
-
-		case KEY_UP:
-		case 'k':
-		case 'K':
-			if (ttyclock.geo.x >= 1 && !ttyclock.option.center)
-				clock_move(ttyclock.geo.x - 1, ttyclock.geo.y, ttyclock.geo.w, ttyclock.geo.h);
-			break;
-
-		case KEY_DOWN:
-		case 'j':
-		case 'J':
-			if (ttyclock.geo.x <= (LINES - ttyclock.geo.h - DATEWINH) && !ttyclock.option.center)
-				clock_move(ttyclock.geo.x + 1, ttyclock.geo.y, ttyclock.geo.w, ttyclock.geo.h);
-			break;
-
-		case KEY_LEFT:
-		case 'h':
-		case 'H':
-			if (ttyclock.geo.y >= 1 && !ttyclock.option.center)
-				clock_move(ttyclock.geo.x, ttyclock.geo.y - 1, ttyclock.geo.w, ttyclock.geo.h);
-			break;
-
-		case KEY_RIGHT:
-		case 'l':
-		case 'L':
-			if (ttyclock.geo.y <= (COLS - ttyclock.geo.w - 1) && !ttyclock.option.center)
-				clock_move(ttyclock.geo.x, ttyclock.geo.y + 1, ttyclock.geo.w, ttyclock.geo.h);
-			break;
-
-		case 'q':
-		case 'Q':
-			if (ttyclock.option.noquit == false)
-				ttyclock.running = false;
-			break;
-
-		case 's':
-		case 'S':
-			set_second();
-			break;
-
-		case 't':
-		case 'T':
-			ttyclock.option.twelve = !ttyclock.option.twelve;
-			/* Set the new ttyclock.date.datestr to resize date window */
-			update_hour();
-			clock_move(ttyclock.geo.x, ttyclock.geo.y, ttyclock.geo.w, ttyclock.geo.h);
-			break;
-
-		case 'c':
-		case 'C':
-			set_center(!ttyclock.option.center);
-			break;
-
-		case 'b':
-		case 'B':
-			ttyclock.option.bold = !ttyclock.option.bold;
-			break;
-
-		case 'r':
-		case 'R':
-			ttyclock.option.rebound = !ttyclock.option.rebound;
-			if (ttyclock.option.rebound && ttyclock.option.center)
-				ttyclock.option.center = false;
-			break;
-
-		case 'x':
-		case 'X':
-			set_box(!ttyclock.option.box);
-			break;
-
-		case '0':
-		case '1':
-		case '2':
-		case '3':
-		case '4':
-		case '5':
-		case '6':
-		case '7':
-			i = c - '0';
-			ttyclock.option.color = i;
-			init_pair(1, ttyclock.bg, i);
-			init_pair(2, i, ttyclock.bg);
-			break;
-
-		default:
-			pselect(1, &rfds, NULL, NULL, &length, NULL);
-	}
-
-	return;
-}
-
-void print_banner(const char *line1, const char *line2) {
-	// FILE *chess = popen("toilet -f smblock \"Let\'s play chess\"! | boxes -d cat -p h8", "r");
-	FILE *logo = popen("toilet -f smblock \"Let\'s play chess\"!", "r");
-	if (logo) {
-		int ch;
-		wmove(ttyclock.framewin, 0, 0);
-		wattron(ttyclock.framewin, COLOR_PAIR(23) | A_BOLD);
-		while ((ch = fgetc(logo)) != EOF)
-			waddch(ttyclock.framewin, ch);
-		wattroff(ttyclock.framewin, COLOR_PAIR(23) | A_BOLD);
-		pclose(logo);
-	}
-}
-
-int main(int argc, char **argv) {
-	int c;
-
-	/* Alloc ttyclock */
-	memset(&ttyclock, 0, sizeof(ttyclock_t));
-
-	ttyclock.option.date = true;
-
-	/* Default date format */
-	strncpy(ttyclock.option.format, "%F", sizeof(ttyclock.option.format));
-	/* Default color */
-	ttyclock.option.color = COLOR_GREEN; /* COLOR_GREEN = 2 */
-	/* Default delay */
-	ttyclock.option.delay = 1; /* 1FPS */
-	ttyclock.option.nsdelay = 0; /* -0FPS */
-	ttyclock.option.blink = false;
-
-	atexit(cleanup);
-
-	while ((c = getopt(argc, argv, "iuvsScbtrhBxnDC:f:d:T:a:")) != -1) {
-		switch (c) {
-			case 'h':
-			default:
-				printf("usage : tty-clock [-iuvsScbtrahDBxn] [-C [0-7]] [-f format] [-d delay] [-a nsdelay] [-T tty] \n"
-					   "    -s            Show seconds                                   \n"
-					   "    -S            Screensaver mode                               \n"
-					   "    -x            Show box                                       \n"
-					   "    -c            Set the clock at the center of the terminal    \n"
-					   "    -C [0-7]      Set the clock color                            \n"
-					   "    -b            Use bold colors                                \n"
-					   "    -t            Set the hour in 12h format                     \n"
-					   "    -u            Use UTC time                                   \n"
-					   "    -T tty        Display the clock on the specified terminal    \n"
-					   "    -r            Do rebound the clock                           \n"
-					   "    -f format     Set the date format                            \n"
-					   "    -n            Don't quit on keypress                         \n"
-					   "    -v            Show tty-clock version                         \n"
-					   "    -i            Show some info about tty-clock                 \n"
-					   "    -h            Show this page                                 \n"
-					   "    -D            Hide date                                      \n"
-					   "    -B            Enable blinking colon                          \n"
-					   "    -d delay      Set the delay between two redraws of the clock. Default 1s. \n"
-					   "    -a nsdelay    Additional delay between two redraws in nanoseconds. Default 0ns.\n");
-				exit(EXIT_SUCCESS);
-				break;
-			case 'i':
-				puts("TTY-Clock 2 © by Martin Duquesnoy (xorg62@gmail.com), Grey (grey@greytheory.net)");
-				exit(EXIT_SUCCESS);
-				break;
-			case 'u':
-				ttyclock.option.utc = true;
-				break;
-			case 'v':
-				puts("TTY-Clock 2 © devel version");
-				exit(EXIT_SUCCESS);
-				break;
-			case 's':
-				ttyclock.option.second = true;
-				break;
-			case 'S':
-				ttyclock.option.screensaver = true;
-				break;
-			case 'c':
-				ttyclock.option.center = true;
-				break;
-			case 'b':
-				ttyclock.option.bold = true;
-				break;
-			case 'C':
-				if (atoi(optarg) >= 0 && atoi(optarg) < 8)
-					ttyclock.option.color = atoi(optarg);
-				break;
-			case 't':
-				ttyclock.option.twelve = true;
-				break;
-			case 'r':
-				ttyclock.option.rebound = true;
-				break;
-			case 'f':
-				strncpy(ttyclock.option.format, optarg, 100);
-				break;
-			case 'd':
-				if (atol(optarg) >= 0 && atol(optarg) < 100)
-					ttyclock.option.delay = atol(optarg);
-				break;
-			case 'D':
-				ttyclock.option.date = false;
-				break;
-			case 'B':
-				ttyclock.option.blink = true;
-				break;
-			case 'a':
-				if (atol(optarg) >= 0 && atol(optarg) < 1000000000)
-					ttyclock.option.nsdelay = atol(optarg);
-				break;
-			case 'x':
-				ttyclock.option.box = true;
-				break;
-			case 'T': {
-				struct stat sbuf;
-				if (stat(optarg, &sbuf) == -1) {
-					fprintf(stderr, "my-tty-clock: error: couldn't stat '%s': %s.\n",
-							optarg, strerror(errno));
-					exit(EXIT_FAILURE);
-				} else if (!S_ISCHR(sbuf.st_mode)) {
-					fprintf(stderr, "my-tty-clock: error: '%s' doesn't appear to be a character device.\n",
-							optarg);
-					exit(EXIT_FAILURE);
-				} else {
-					free(ttyclock.tty);
-					ttyclock.tty = strdup(optarg);
-				}
-			} break;
-			case 'n':
-				ttyclock.option.noquit = true;
-				break;
-		}
-	}
-
-	init();
-	attron(A_BLINK);
-	while (ttyclock.running) {
-		clock_rebound();
-		update_hour();
-		draw_clock();
-		print_banner("Word in Spanish", "bbb");
-		key_event();
-	}
-
-	endwin();
-
-	return 0;
-}
-
-// vim: expandtab tabstop=5 softtabstop=5 shiftwidth=5
