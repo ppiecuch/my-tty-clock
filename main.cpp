@@ -33,6 +33,7 @@ static void usage(int argc, char **argv) {
 	fprintf(stderr, "  -v, --version\t\t\tVersion of the program\n");
 	fprintf(stderr, "  -f, --font=FONT\t\tUse FONT for time display\n");
 	fprintf(stderr, "  -d, --dateformat=FORMAT\tUse FORMAT as strftime argument (default %%R:%%S)\n");
+	fprintf(stderr, "  -r, --refreshrate\t\t\tDisplay refresh rate\n");
 }
 
 static void version(void) {
@@ -73,7 +74,7 @@ int main(int argc, char *argv[]) {
 	caca_canvas_t *cv;
 	caca_canvas_t *figcv, *figln1, *figln2;
 	caca_display_t *dp;
-	uint32_t w, h, fw, fh;
+	uint32_t w, h, fw, fh, refreshrate = 5;
 
 	const char *format = "%R:%S";
 	const char *font = "/usr/share/figlet/mono9.tlf";
@@ -88,8 +89,9 @@ int main(int argc, char *argv[]) {
 			{ "dateformat", 1, NULL, 'd' },
 			{ "help", 0, NULL, 'h' },
 			{ "version", 0, NULL, 'v' },
+			{ "refreshrate", 1, NULL, 'r' },
 		};
-		int c = caca_getopt(argc, argv, "f:d:hv", long_options, &option_index);
+		int c = caca_getopt(argc, argv, "f:d:r:hv", long_options, &option_index);
 		if (c == -1)
 			break;
 
@@ -104,6 +106,9 @@ int main(int argc, char *argv[]) {
 				break;
 			case 'f': /* --font       */
 				font = caca_optarg;
+				break;
+			case 'r': /* --refreshrate       */
+				refreshrate = caca_optarg;
 				break;
 			case 'd': /* --dateformat */
 				format = caca_optarg;
@@ -179,7 +184,7 @@ int main(int argc, char *argv[]) {
 		fw = caca_get_canvas_width(figcv);
 		fh = caca_get_canvas_height(figcv);
 
-		uint32_t x = (w / 2) - (fw / 2);
+		uint32_t x = (w - fw) / 2;
 		uint32_t y = 1;
 
 		caca_blit(cv, x, y, figcv, NULL);
@@ -213,9 +218,9 @@ int main(int argc, char *argv[]) {
 			caca_flush_figlet(figln1);
 
 			fw = caca_get_canvas_width(figln1);
-			fh = fh + caca_get_canvas_height(figln1) / 2;
+			fh = fh + caca_get_canvas_height(figln1);
 
-			caca_blit(cv, 1, fh + 1, figln1, NULL);
+			caca_blit(cv, 1, (fh + 1) / 2, figln1, NULL);
 		}
 
 		if (!line2.empty()) {
@@ -225,9 +230,9 @@ int main(int argc, char *argv[]) {
 			caca_flush_figlet(figln2);
 
 			fw = caca_get_canvas_width(figln2);
-			fh = fh + caca_get_canvas_height(figln2) / 2;
+			fh = fh + caca_get_canvas_height(figln2);
 
-			caca_blit(cv, 1, fh + 1, figln2, NULL);
+			caca_blit(cv, 1, (fh + 1) / 2, figln2, NULL);
 		}
 
 		char file_ctime[128] = { 0 };
