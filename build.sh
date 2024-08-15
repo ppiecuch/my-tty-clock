@@ -12,6 +12,6 @@ else
 fi
 
 LIBS="$(ncurses6-config --libs) $(caca-config --libs)"
-OPTS=""
+OPTS="-I modules"
 
 g++ -o my-words-memo $OPTS *.cpp $CURL $LIBS
