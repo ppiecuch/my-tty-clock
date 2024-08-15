@@ -194,15 +194,15 @@ int main(int argc, char *argv[]) {
 			CSimpleIniA::TNamesDepend sections;
 			ini.GetAllSections(sections);
 
-			int sect = 0;
-			int key = rand() % ini.GetSectionSize(sections.begin()->pItem);
+			const char *sect = sections.begin()->pItem; // first section
+			int key = rand() % ini.GetSectionSize(sect);
 
-			std::string s = ini.GetValue(sections[sect], f_ssprintf("%s", key));
+			std::string s = ini.GetValue(sect, f_ssprintf("%s", key));
 			std::string delimiter = "::";
 			line1 = s.substr(0, s.find(delimiter));
 			line2 = s.substr(s.find(delimiter) + 2);
 
-			selection += " | " + sections[sect];
+			selection += " | " + sect;
 		}
 
 		for (const char &c : line1) {
