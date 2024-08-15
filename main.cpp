@@ -10,7 +10,7 @@
 #define APPVERSION "0.1"
 
 static void filter_metal(caca_canvas_t *cx, unsigned int lines);
-static void filter_rainbow(caca_canvas_t *cx);
+static void filter_rainbow(caca_canvas_t *cx, unsigned int lines);
 static void filter_border(caca_canvas_t *cx);
 
 static void usage(int argc, char **argv) {
@@ -138,7 +138,7 @@ int main(int argc, char *argv[]) {
 			caca_put_figchar(figcv, d[o++]);
 		}
 		caca_flush_figlet(figcv);
-		filter_rainbow(figcv);
+		filter_rainbow(figcv, 0);
 		free(d);
 
 		w = caca_get_canvas_width(cv);
@@ -158,6 +158,7 @@ int main(int argc, char *argv[]) {
 			caca_put_figchar(figln1, line1[o++]);
 		}
 		caca_flush_figlet(figln1);
+		filter_metal(figln1, 0);
 
 		fw = caca_get_canvas_width(figln1);
 		fh = fh + caca_get_canvas_height(figln1);
