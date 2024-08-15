@@ -687,7 +687,7 @@ int main(int argc, char **argv) {
 			stat(LOCALCACHE, &attr);
 			strftime(file_ctime, 128, " | Modification time %d-%m-%y,%H:%M", localtime(&(attr.st_ctime)));
 		}
-		waddstr(status, 0, h - 1, f_ssprintf("Version %s | Sections %d%s%s", APPVERSION, ini.GetSectionsSize(), file_ctime, selection.c_str()));
+		mvwaddstr(status, 0, h - 1, f_ssprintf("Version %s | Sections %d%s%s", APPVERSION, ini.GetSectionsSize(), file_ctime, selection.c_str()));
 		key_event();
 	}
 
