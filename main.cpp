@@ -12,6 +12,12 @@
 #define WORDSURL "https://github.com/ppiecuch/shared-assets/blob/master/words.txt"
 #define APPVERSION "0.1"
 
+#define f_ssprintf(...) \
+	({ int _ss_size = snprintf(0, 0, ##__VA_ARGS__);    \
+    char *_ss_ret = (char*)alloca(_ss_size+1);          \
+    snprintf(_ss_ret, _ss_size+1, ##__VA_ARGS__);       \
+    _ss_ret; })
+
 static void filter_metal(caca_canvas_t *cx, unsigned int lines);
 static void filter_rainbow(caca_canvas_t *cx, unsigned int lines);
 static void filter_border(caca_canvas_t *cx);
