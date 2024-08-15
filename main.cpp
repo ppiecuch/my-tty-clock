@@ -219,7 +219,7 @@ int main(int argc, char *argv[]) {
 
 			fw = caca_get_canvas_width(figln1);
 
-			caca_blit(cv, 0, (fh + 1) / 2, figln1, NULL);
+			caca_blit(cv, 0, fh + 1, figln1, NULL);
 
 			fh += caca_get_canvas_height(figln1);
 		}
@@ -232,7 +232,7 @@ int main(int argc, char *argv[]) {
 
 			fw = caca_get_canvas_width(figln2);
 
-			caca_blit(cv, 0, (fh + 1) / 2, figln2, NULL);
+			caca_blit(cv, 0, fh + 1, figln2, NULL);
 
 			fh += caca_get_canvas_height(figln2);
 		}
