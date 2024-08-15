@@ -33,9 +33,9 @@ static void version(void) {
 			CACACLOCKVERSION, caca_get_version(), __DATE__);
 }
 
-static char *get_date(char *format) {
+static char *get_date(const char *format) {
 	time_t currtime;
-	char *charTime = malloc(101);
+	char *charTime = (char*)malloc(101);
 
 	time(&currtime);
 	strftime(charTime, 100, format, localtime(&currtime));
@@ -49,8 +49,8 @@ int main(int argc, char *argv[]) {
 	caca_display_t *dp;
 	uint32_t w, h, fw, fh;
 
-	char *format = "%R:%S";
-	char *font = "/usr/share/figlet/mono12.tlf";
+	const char *format = "%R:%S";
+	const char *font = "/usr/share/figlet/mono12.tlf";
 
 	for (;;) {
 		int option_index = 0;

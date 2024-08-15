@@ -11,7 +11,7 @@ else
   CURL="-lcurl"
 fi
 
-LIBS="$(ncurses6-config --libs)"
+LIBS="$(ncurses6-config --libs) $(caca-config --libs)"
 OPTS=""
 
-g++ -o my-tty-clock $OPTS *.cpp $CURL $LIBS
+g++ -o my-words-memo $OPTS *.cpp $CURL $LIBS
