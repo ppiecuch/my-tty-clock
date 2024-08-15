@@ -690,7 +690,7 @@ int main(int argc, char **argv) {
 			stat(LOCALCACHE, &attr);
 			strftime(file_ctime, 128, "|Last %d-%m-%y,%H:%M", localtime(&(attr.st_ctime)));
 		}
-		mvwaddstr(status, 0, 0, f_ssprintf("v%s|%d|%s%s", APPVERSION, int(refreshrate) - elapsedTime, selection.c_str()));
+		mvwaddstr(status, 0, 0, f_ssprintf("v%s|%d|%s%s", APPVERSION, int(refreshrate - elapsedTime), selection.c_str()));
 		wrefresh(status);
 		key_event();
 	}
