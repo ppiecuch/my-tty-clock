@@ -641,6 +641,13 @@ int main(int argc, char **argv) {
 
 	init();
 	attron(A_BLINK);
+
+	/* Create status win */
+	WINDOW *status = newwin(1, COLS, 0, LINES - 1);
+	wattron(status, A_BLINK);
+
+	wrefresh(ttyclock.framewin);
+
 	while (ttyclock.running) {
 		if (!file_exists(LOCALCACHE)) {
 			if (par_easycurl_to_file(WORDSURL, LOCALCACHE)) {
@@ -680,7 +687,7 @@ int main(int argc, char **argv) {
 			stat(LOCALCACHE, &attr);
 			strftime(file_ctime, 128, " | Modification time %d-%m-%y,%H:%M", localtime(&(attr.st_ctime)));
 		}
-		maddstr(cv, 0, h - 1, f_ssprintf("Version %s | Sections %d%s%s", APPVERSION, ini.GetSectionsSize(), file_ctime, selection.c_str()));
+		waddstr(status, 0, h - 1, f_ssprintf("Version %s | Sections %d%s%s", APPVERSION, ini.GetSectionsSize(), file_ctime, selection.c_str()));
 		key_event();
 	}
 
