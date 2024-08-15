@@ -501,7 +501,7 @@ void key_event(void) {
 
 static int file_exists(const char *file) { return (access(file, F_OK) == 0); }
 
-void print_wordsmemo(const char *line1, const char *line2) {
+void print_wordsmemo(const std::string &line1, const std::string &line2) {
 }
 
 int main(int argc, char **argv) {
@@ -629,13 +629,55 @@ int main(int argc, char **argv) {
 		}
 	}
 
+	struct timeval t1, t2;
+	double elapsedTime = 9999;
+
+	gettimeofday(&t1, NULL);
+
+	std::string line1, line2, selection;
+
+	CSimpleIniA ini;
+	ini.SetUnicode(true);
+
 	init();
 	attron(A_BLINK);
 	while (ttyclock.running) {
+		if (!file_exists(LOCALCACHE)) {
+			if (par_easycurl_to_file(WORDSURL, LOCALCACHE)) {
+				SI_Error rc = ini.LoadFile(LOCALCACHE);
+				if (rc < 0) {
+					fprintf(stderr, "%s: unable to load words data (error 0x%X)\n", argv[0], rc);
+					return 100;
+				};
+			}
+		}
 		clock_rebound();
 		update_hour();
 		draw_clock();
-		print_wordsmemo("Word in Spanish", "bbb");
+
+		if (elapsedTime > 5 && ini.GetSectionsSize() > 0) {
+			gettimeofday(&t1, NULL); // reset
+
+			const char *sect = sections.begin()->pItem; // first section
+			int key = rand() % ini.GetSectionSize(sect);
+
+			std::string s = ini.GetValue(sect, f_ssprintf("%d", key));
+			std::string delimiter = "::";
+			line1 = s.substr(0, s.find(delimiter));
+			line2 = s.substr(s.find(delimiter) + 2);
+
+			selection = std::string(" | ") + sect;
+		}
+		gettimeofday(&t2, NULL);
+		elapsedTime = t2.tv_sec - t1.tv_sec;
+		print_wordsmemo(line1, line2);
+		char file_ctime[128] = { 0 };
+		if (file_exists(LOCALCACHE)) {
+			struct stat attr;
+			stat(LOCALCACHE, &attr);
+			strftime(file_ctime, 128, " | Modification time %d-%m-%y,%H:%M", localtime(&(attr.st_ctime)));
+		}
+		maddstr(cv, 0, h - 1, f_ssprintf("Version %s | Sections %d%s%s", APPVERSION, ini.GetSectionsSize(), file_ctime, selection.c_str()));
 		key_event();
 	}
 
