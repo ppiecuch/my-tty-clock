@@ -211,10 +211,21 @@ int main(int argc, char *argv[]) {
 				caca_put_figchar(figln1, c);
 			}
 			caca_flush_figlet(figln1);
-			// filter_metal(figln1, 0);
 
 			fw = caca_get_canvas_width(figln1);
 			fh = fh + caca_get_canvas_height(figln1);
+
+			caca_blit(cv, 1, fh + 1, figln1, NULL);
+		}
+
+		if (!line2.empty()) {
+			for (const char &c : line2) {
+				caca_put_figchar(figln2, c);
+			}
+			caca_flush_figlet(figln2);
+
+			fw = caca_get_canvas_width(figln2);
+			fh = fh + caca_get_canvas_height(figln2);
 
 			caca_blit(cv, 1, fh + 1, figln1, NULL);
 		}
