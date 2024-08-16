@@ -700,7 +700,9 @@ int main(int argc, char **argv) {
 		elapsedTime = t2.tv_sec - t1.tv_sec;
 		if (!line1.empty() && !line2.empty()) {
 			werase(memo);
+			wbkgdset(memo, COLOR_PAIR(2));
 			mvwaddstr(memo, 0, 0, line1.c_str());
+			wbkgdset(memo, COLOR_PAIR(0));
 			mvwaddstr(memo, 1, 0, line2.c_str());
 			wrefresh(memo);
 		}
@@ -711,8 +713,8 @@ int main(int argc, char **argv) {
 			fileEdge = time(NULL) - attr.st_mtime;
 			strftime(file_ctime, 128, "|Cache %H:%M", localtime(&(attr.st_mtime)));
 		}
-		wbkgdset(status, COLOR_PAIR(2));
-		mvwaddstr(status, 1, 0, f_ssprintf("v%s|%d|%s%s", APPVERSION, int(refreshrate - elapsedTime), file_ctime, selection.c_str()));
+		wbkgdset(status, COLOR_PAIR(1));
+		mvwaddstr(status, 0, 0, f_ssprintf("v%s|%d|%s%s", APPVERSION, int(refreshrate - elapsedTime), file_ctime, selection.c_str()));
 		wrefresh(status);
 		key_event();
 	}
