@@ -7,6 +7,7 @@ trap cleanup SIGINT
 cleanup() {
     clear
     [[ -f previous_font ]] && setfont previous_font
+    rm -f previous_font
    	setterm --reset
 }
 
