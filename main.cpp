@@ -3,6 +3,8 @@
  *      Main file.
  */
 
+#define _X_OPEN_SOURCE_EXTENDED
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
