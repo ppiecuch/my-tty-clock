@@ -714,7 +714,10 @@ int main(int argc, char **argv) {
 			strftime(file_ctime, 128, "|Cache %H:%M", localtime(&(attr.st_mtime)));
 		}
 		wbkgdset(status, COLOR_PAIR(1));
-		mvwaddstr(status, 0, 0, f_ssprintf("v%s|%d|%s%s", APPVERSION, int(refreshrate - elapsedTime), file_ctime, selection.c_str()));
+		std::string stats = f_ssprintf("v%s|%d|%s%s", APPVERSION, int(refreshrate - elapsedTime), file_ctime, selection.c_str());
+		if (stats.size() < COLS)
+			stats.insert(stats.end(), COLS - stats.size(), ' ');
+		mvwaddstr(status, 0, 0, stats.c_str());
 		wrefresh(status);
 		key_event();
 	}
