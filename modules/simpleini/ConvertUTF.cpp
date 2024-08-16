@@ -608,6 +608,7 @@ ConversionResult ConvertUTF8toUTF32(const UTF8 **sourceStart, const UTF8 *source
 #ifdef __cplusplus
 
 #include <cassert>
+#include <cstring>
 
 class StringRef {
 public:
