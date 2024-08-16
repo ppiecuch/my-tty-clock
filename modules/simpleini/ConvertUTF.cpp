@@ -652,9 +652,6 @@ public:
 	StringRef(const std::string &Str) : // Construct a string ref from an std::string.
 			Data(Str.data()), Length(Str.length()) {}
 
-	constexpr StringRef(std::string_view Str) : // Construct a string ref from an std::string_view.
-			Data(Str.data()), Length(Str.size()) {}
-
 	iterator begin() const { return Data; }
 	iterator end() const { return Data + Length; }
 	const unsigned char *bytes_begin() const { return reinterpret_cast<const unsigned char *>(begin()); }
