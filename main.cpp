@@ -703,7 +703,11 @@ int main(int argc, char **argv) {
 		if (!line1.empty() && !line2.empty()) {
 			werase(memo);
 			wbkgdset(memo, COLOR_PAIR(2));
-			mvwaddstr(memo, 0, 0, line1.c_str());
+			std::wstring res;
+			if (ConvertUTF8toWide(line1.c_str(), res))
+				mvwaddwstr(memo, 0, 0, res.c_str());
+			else
+				mvwaddstr(memo, 0, 0, line1.c_str());
 			wbkgdset(memo, COLOR_PAIR(0));
 			mvwaddstr(memo, 1, 0, line2.c_str());
 			wrefresh(memo);
