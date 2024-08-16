@@ -634,9 +634,7 @@ private:
 public:
 	StringRef() = default; // Construct an empty string ref.
 	StringRef(std::nullptr_t) = delete; // Disable conversion from nullptr.  This prevents things like if (S == nullptr)
-
-	// Construct a string ref from a cstring.
-	constexpr StringRef(const char *Str) :
+	constexpr StringRef(const char *Str) : // Construct a string ref from a cstring.
 			Data(Str), Length(Str ?
 	// GCC 7 doesn't have constexpr char_traits. Fall back to __builtin_strlen.
 #if defined(_GLIBCXX_RELEASE) && _GLIBCXX_RELEASE < 8
@@ -646,10 +644,8 @@ public:
 #endif
 								  : 0) {
 	}
-
-	constexpr StringRef(const char *data, size_t length) :
-			Data(data), Length(length) {} // Construct a string ref from a pointer and length.
-
+	constexpr StringRef(const char *data, size_t length) : // Construct a string ref from a pointer and length.
+			Data(data), Length(length) {}
 	StringRef(const std::string &Str) : // Construct a string ref from an std::string.
 			Data(Str.data()), Length(Str.length()) {}
 
@@ -710,10 +706,6 @@ public:
 	}
 };
 
-/*
- * Exported function to return whether a UTF-8 string is legal or not.
- * This is not used here; it's just exported.
- */
 static bool isLegalUTF8String(const UTF8 **source, const UTF8 *sourceEnd) {
 	while (*source != sourceEnd) {
 		int length = trailingBytesForUTF8[**source] + 1;
@@ -745,9 +737,7 @@ static bool ConvertUTF8toWide(unsigned wideCharWidth, const StringRef &source, c
 		// using reinterpret_cast.
 		UTF16 *targetStart = reinterpret_cast<UTF16 *>(resultPtr);
 		ConversionFlags flags = strictConversion;
-		result =
-				ConvertUTF8toUTF16(&sourceStart, sourceStart + source.size(),
-						&targetStart, targetStart + source.size(), flags);
+		result = ConvertUTF8toUTF16(&sourceStart, sourceStart + source.size(), &targetStart, targetStart + source.size(), flags);
 		if (result == conversionOK)
 			resultPtr = reinterpret_cast<char *>(targetStart);
 		else
@@ -764,8 +754,7 @@ static bool ConvertUTF8toWide(unsigned wideCharWidth, const StringRef &source, c
 		else
 			errorPtr = sourceStart;
 	}
-	//assert((result != targetExhausted) &&
-	//       "ConvertUTF8toUTFXX exhausted target buffer");
+	// assert((result != targetExhausted) && "ConvertUTF8toUTFXX exhausted target buffer");
 	return result == conversionOK;
 }
 
@@ -773,7 +762,6 @@ static bool ConvertUTF8toWide(const StringRef &source, std::wstring &result) {
 	// Even in the case of UTF-16, the number of bytes in a UTF-8 string is
 	// at least as large as the number of elements in the resulting wide
 	// string, because surrogate pairs take at least 4 bytes in UTF-8.
-
 	result.resize(source.size() + 1);
 	char *resultPtr = reinterpret_cast<char *>(&result[0]);
 	const UTF8 *errorPtr;
