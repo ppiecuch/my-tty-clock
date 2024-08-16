@@ -680,7 +680,7 @@ int main(int argc, char **argv) {
 		elapsedTime = t2.tv_sec - t1.tv_sec;
 		if (!line1.empty() && !line2.empty()) {
 			mvwaddstr(memo, 0, 0, line1.c_str());
-			mvwaddstr(memo, 0, 1, line2.c_str());
+			mvwaddstr(memo, 1, 0, line2.c_str());
 			wrefresh(memo);
 		}
 		char file_ctime[128] = { 0 };
