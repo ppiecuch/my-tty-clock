@@ -501,6 +501,26 @@ void key_event(void) {
 
 static int file_exists(const char *file) { return (access(file, F_OK) == 0); }
 
+static std::string trimL(std::string s) {
+	unsigned int i = 0;
+	while (i != s.size() && isspace(s[i]))
+		++i;
+	s.assign(s, i, s.size() - i);
+	return s;
+}
+
+static std::string trimR(std::string s) {
+	int i = s.size() > 0 ? s.size() - 1 : 0;
+	while (i >= 0 && isspace(s[i]))
+		--i;
+	s.assign(s, 0, i + 1);
+	return s;
+}
+
+static std::string trim(std::string s) {
+	return trimL(trimR(s));
+}
+
 int main(int argc, char **argv) {
 	int c;
 	int refreshrate = 30; /* sec */
@@ -671,8 +691,8 @@ int main(int argc, char **argv) {
 
 			std::string s = ini.GetValue(sect, f_ssprintf("%d", key));
 			std::string delimiter = "::";
-			line1 = s.substr(0, s.find(delimiter));
-			line2 = s.substr(s.find(delimiter) + 2);
+			line1 = trim(s.substr(0, s.find(delimiter)));
+			line2 = trim(s.substr(s.find(delimiter) + 2));
 
 			selection = std::string("|") + sect + std::string("/") + f_ssprintf("%d", ini.GetSectionsSize());
 		}
