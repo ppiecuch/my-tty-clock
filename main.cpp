@@ -120,8 +120,8 @@ std::string simplifieDiacritics(const std::string &str) {
 
 	std::string ret = str;
 	for (const auto entry : defaultDiacriticsRemovalMap) {
-		for (const auto ch : entry.value) {
-			ret = ret.replace(ch, entry.key);
+		for (const auto ch : entry.second) {
+			ret = ret.replace(ch, entry.first);
 		}
 	}
 	return ret;
