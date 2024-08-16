@@ -30,7 +30,7 @@
     snprintf(_ss_ret, _ss_size+1, ##__VA_ARGS__);       \
     _ss_ret; })
 
-std::string simplifieDiacritics(const std::string &str) {
+std::wstring simplifieDiacritics(const std::wstring &str) {
 	static std::map<std::string, std::wstring> defaultDiacriticsRemovalMap = {
 		{ "A", L"\u0041\u24B6\uFF21\u00C0\u00C1\u00C2\u1EA6\u1EA4\u1EAA\u1EA8\u00C3\u0100\u0102\u1EB0\u1EAE\u1EB4\u1EB2\u0226\u01E0\u00C4\u01DE\u1EA2\u00C5\u01FA\u01CD\u0200\u0202\u1EA0\u1EAC\u1EB6\u1E00\u0104\u023A\u2C6F" },
 		{ "AA", L"\uA732" },
@@ -118,7 +118,7 @@ std::string simplifieDiacritics(const std::string &str) {
 		{ "z", L"\u007A\u24E9\uFF5A\u017A\u1E91\u017C\u017E\u1E93\u1E95\u01B6\u0225\u0240\u2C6C\uA763" },
 	};
 
-	std::string ret = str;
+	std::wstring ret = str;
 	for (const auto entry : defaultDiacriticsRemovalMap) {
 		for (const auto ch : entry.second) {
 			ret = ret.replace(ch, entry.first);
