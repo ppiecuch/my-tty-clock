@@ -709,7 +709,10 @@ int main(int argc, char **argv) {
 			else
 				mvwaddstr(memo, 0, 0, line1.c_str());
 			wbkgdset(memo, COLOR_PAIR(0));
-			mvwaddstr(memo, 1, 0, line2.c_str());
+			if (ConvertUTF8toWide(line2.c_str(), res))
+				mvwaddwstr(memo, 1, 0, res.c_str());
+			else
+				mvwaddstr(memo, 1, 0, line2.c_str());
 			wrefresh(memo);
 		}
 		char file_ctime[128] = { 0 };
