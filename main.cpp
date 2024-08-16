@@ -541,7 +541,7 @@ int main(int argc, char **argv) {
 
 	atexit(cleanup);
 
-	while ((c = getopt(argc, argv, "iuvsScbtrhBxnDC:f:d:T:a:")) != -1) {
+	while ((c = getopt(argc, argv, "iuvsScbtrR:hBxnDC:f:d:T:a:")) != -1) {
 		switch (c) {
 			case 'h':
 			default:
@@ -555,8 +555,8 @@ int main(int argc, char **argv) {
 					   "    -t            Set the hour in 12h format                     \n"
 					   "    -u            Use UTC time                                   \n"
 					   "    -T tty        Display the clock on the specified terminal    \n"
-					   "    -r            Words-memo display refresh rate                \n"
-					   "    -R            Do rebound the clock                           \n"
+					   "    -R            Words-memo display refresh rate                \n"
+					   "    -r            Do rebound the clock                           \n"
 					   "    -f format     Set the date format                            \n"
 					   "    -n            Don't quit on keypress                         \n"
 					   "    -v            Show tty-clock version                         \n"
@@ -647,7 +647,7 @@ int main(int argc, char **argv) {
 	}
 
 	struct timeval t1, t2;
-	double elapsedTime = 9999;
+	double elapsedTime = 9999, fileEdge = 9999; /* sec */
 
 	gettimeofday(&t1, NULL);
 
@@ -663,12 +663,12 @@ int main(int argc, char **argv) {
 	WINDOW *status = newwin(1, COLS, LINES - 1, 0);
 	wrefresh(status);
 	/* Create memo win */
-	WINDOW *memo = newwin(2, COLS, LINES - 3, 0);
+	WINDOW *memo = newwin(2, COLS, LINES - 4, 0);
 	wattron(memo, A_BLINK);
 	wrefresh(memo);
 
 	while (ttyclock.running) {
-		if (!file_exists(LOCALCACHE) || ini.GetSectionsSize() == 0) {
+		if (!file_exists(LOCALCACHE) || ini.GetSectionsSize() == 0 || fileEdge > 900) {
 			if (par_easycurl_to_file(WORDSURL, LOCALCACHE)) {
 				SI_Error rc = ini.LoadFile(LOCALCACHE);
 				if (rc < 0) {
@@ -708,9 +708,11 @@ int main(int argc, char **argv) {
 		if (file_exists(LOCALCACHE)) {
 			struct stat attr;
 			stat(LOCALCACHE, &attr);
-			strftime(file_ctime, 128, "|Last %d-%m-%y,%H:%M", localtime(&(attr.st_ctime)));
+			fileEdge = time(NULL) - attr.st_mtime;
+			strftime(file_ctime, 128, "|Cache %H:%M", localtime(&(attr.st_mtime)));
 		}
-		mvwaddstr(status, 0, 0, f_ssprintf("v%s|%d|%s%s", APPVERSION, int(refreshrate - elapsedTime), file_ctime, selection.c_str()));
+		wbkgdset(status, COLOR_PAIR(2));
+		mvwaddstr(status, 1, 0, f_ssprintf("v%s|%d|%s%s", APPVERSION, int(refreshrate - elapsedTime), file_ctime, selection.c_str()));
 		wrefresh(status);
 		key_event();
 	}
