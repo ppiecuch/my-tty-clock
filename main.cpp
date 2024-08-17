@@ -853,7 +853,7 @@ int main(int argc, char **argv) {
 		clock_rebound();
 		update_hour();
 		draw_clock();
-		if (elapsedTime > refreshrate && ini.GetSectionsSize() > 0) {
+		if (elapsedTime >= refreshrate && ini.GetSectionsSize() > 0) {
 			gettimeofday(&t1, NULL); // reset
 
 			CSimpleIniA::TNamesDepend sections;
