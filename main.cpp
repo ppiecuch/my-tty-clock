@@ -43,8 +43,6 @@ String string_replace_all(String &str, const String &from, const String &to) {
 }
 
 static std::wstring string_replace_all(std::wstring &str, wchar_t from, const std::string &to) {
-	if (from.empty())
-		return;
 	size_t start_pos = 0;
 	while ((start_pos = str.find(from, start_pos)) != std::string::npos) {
 		str.replace(start_pos, 1, to);
