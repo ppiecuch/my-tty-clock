@@ -30,7 +30,7 @@
     snprintf(_ss_ret, _ss_size+1, ##__VA_ARGS__);       \
     _ss_ret; })
 
-static template <String>
+static template <typename String>
 String string_replace_all(String &str, const String &from, const String &to) {
 	if (from.empty())
 		return;
@@ -53,7 +53,7 @@ static std::wstring string_replace_all(std::wstring &str, wchar_t from, const st
 	return str;
 }
 
-static template <String>
+static template <typename String>
 String string_replace(String &str, const String &from, const String &to) {
 	size_t start_pos = str.find(from);
 	if (start_pos == String::npos)
