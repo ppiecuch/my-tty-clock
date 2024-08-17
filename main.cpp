@@ -822,7 +822,7 @@ int main(int argc, char **argv) {
 		for (CSimpleIniA::TNamesDepend::const_iterator it = sects.begin(); it != sects.end(); ++it) {
 			printf(" %s = %d values\n", it->pItem, ini.GetSectionSize(it->pItem));
 		}
-		printf("===============");
+		printf("===============\n");
 		return 0;
 	}
 
