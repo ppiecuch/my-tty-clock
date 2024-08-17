@@ -858,7 +858,7 @@ int main(int argc, char **argv) {
 			const char *sect = sections.begin()->pItem; // first section
 			std::string key = f_ssprintf("%d", 1 + (rand() % ini.GetSectionSize(sect)));
 
-			if (ini.KeyExists(sect. key) {
+			if (ini.KeyExists(sect.key)) {
 				std::string s = ini.GetValue(sect, key);
 				std::string delimiter = "::";
 				line1 = trim(s.substr(0, s.find(delimiter)));
