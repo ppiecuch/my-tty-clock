@@ -42,9 +42,9 @@ String string_replace_all(String &str, const String &from, const String &to) {
 	return str;
 }
 
-static std::wstring string_replace_all(std::wstring &str, wchar_t from, const std::string &to) {
+static std::wstring string_replace_all(std::wstring &str, wchar_t from, const std::wstring &to) {
 	size_t start_pos = 0;
-	while ((start_pos = str.find(from, start_pos)) != std::string::npos) {
+	while ((start_pos = str.find(from, start_pos)) != std::wstring::npos) {
 		str.replace(start_pos, 1, to);
 		start_pos += to.length(); // In case 'to' contains 'from', like replacing 'x' with 'yx'
 	}
