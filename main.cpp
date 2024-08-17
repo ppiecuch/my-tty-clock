@@ -818,7 +818,7 @@ int main(int argc, char **argv) {
 		}
 		CSimpleIniA::TNamesDepend sects;
 		ini.GetAllSections(sects);
-		printf("Sections/keys:");
+		printf("Sections/keys:\n");
 		for (CSimpleIniA::TNamesDepend::const_iterator it = sects.begin(); it != sects.end(); ++it) {
 			printf(" %s = %d values\n", it->pItem, ini.GetSectionSize(it->pItem));
 		}
