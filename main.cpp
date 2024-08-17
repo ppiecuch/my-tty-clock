@@ -856,18 +856,18 @@ int main(int argc, char **argv) {
 			ini.GetAllSections(sections);
 
 			const char *sect = sections.begin()->pItem; // first section
-			std::string key = f_ssprintf("%d", rand() % ini.GetSectionSize(sect));
+			std::string key = f_ssprintf("%d", 1 + (rand() % ini.GetSectionSize(sect)));
 
 			if (ini.KeyExists(sect. key) {
-				std::string s = ini.GetValue(sect, f_ssprintf("%d", key + 1));
+				std::string s = ini.GetValue(sect, key);
 				std::string delimiter = "::";
 				line1 = trim(s.substr(0, s.find(delimiter)));
 				line2 = trim(s.substr(s.find(delimiter) + 2));
 			} else {
-				key += "!"
+				key += "!";
 			}
 
-			selection = std::string("|") + sect + std::string(",") + f_ssprintf("%d", key);
+			selection = std::string("|") + sect + std::string(",") + key;
 		}
 		gettimeofday(&t2, NULL);
 		elapsedTime = t2.tv_sec - t1.tv_sec;
