@@ -30,18 +30,19 @@
     snprintf(_ss_ret, _ss_size+1, ##__VA_ARGS__);       \
     _ss_ret; })
 
-static void string_replace_all(std::wstring &str, const std::string &from, const std::string &to) {
+static template <String>
+String string_replace_all(String &str, const String &from, const String &to) {
 	if (from.empty())
 		return;
 	size_t start_pos = 0;
-	while ((start_pos = str.find(from, start_pos)) != std::string::npos) {
+	while ((start_pos = str.find(from, start_pos)) != String::npos) {
 		str.replace(start_pos, from.length(), to);
 		start_pos += to.length(); // In case 'to' contains 'from', like replacing 'x' with 'yx'
 	}
 	return str;
 }
 
-static void string_replace_all(std::wstring &str, wchar_t from, const std::string &to) {
+static std::wstring string_replace_all(std::wstring &str, wchar_t from, const std::string &to) {
 	if (from.empty())
 		return;
 	size_t start_pos = 0;
@@ -52,9 +53,10 @@ static void string_replace_all(std::wstring &str, wchar_t from, const std::strin
 	return str;
 }
 
-static std::wstring string_replace(std::wstring &str, const std::wstring &from, const std::wstring &to) {
+static template <String>
+String string_replace(String &str, const String &from, const String &to) {
 	size_t start_pos = str.find(from);
-	if (start_pos == std::string::npos)
+	if (start_pos == String::npos)
 		return str;
 	return str.replace(start_pos, from.length(), to);
 }
@@ -157,7 +159,7 @@ std::wstring simplifieDiacritics(const std::wstring &str) {
 	std::wstring ret = str;
 	for (const auto entry : defaultDiacriticsRemovalMap) {
 		for (const auto ch : entry.second) {
-			ret = ret.replace(std::wstring(&ch, 1), entry.first);
+			string_replace_all(ret, ch, entry.first);
 		}
 	}
 	return ret;
