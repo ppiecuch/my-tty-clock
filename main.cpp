@@ -30,7 +30,7 @@
     snprintf(_ss_ret, _ss_size+1, ##__VA_ARGS__);       \
     _ss_ret; })
 
-void string_replace_all(std::string &str, const std::string &from, const std::string &to) {
+static void string_replace_all(std::wstring &str, const std::string &from, const std::string &to) {
 	if (from.empty())
 		return;
 	size_t start_pos = 0;
@@ -38,19 +38,31 @@ void string_replace_all(std::string &str, const std::string &from, const std::st
 		str.replace(start_pos, from.length(), to);
 		start_pos += to.length(); // In case 'to' contains 'from', like replacing 'x' with 'yx'
 	}
+	return str;
 }
 
-std::wstring string_replace(std::wstring &str, const std::wstring &from, const std::wstring &to) {
+static void string_replace_all(std::wstring &str, wchar_t from, const std::string &to) {
+	if (from.empty())
+		return;
+	size_t start_pos = 0;
+	while ((start_pos = str.find(from, start_pos)) != std::string::npos) {
+		str.replace(start_pos, 1, to);
+		start_pos += to.length(); // In case 'to' contains 'from', like replacing 'x' with 'yx'
+	}
+	return str;
+}
+
+static std::wstring string_replace(std::wstring &str, const std::wstring &from, const std::wstring &to) {
 	size_t start_pos = str.find(from);
 	if (start_pos == std::string::npos)
 		return str;
 	return str.replace(start_pos, from.length(), to);
 }
 
-std::wstring string_replace(std::wstring &str, wchar_t &from, const std::wstring &to) {
+static std::wstring string_replace(std::wstring &str, wchar_t from, const std::wstring &to) {
 	size_t start_pos = str.find(from);
 	if (start_pos == std::string::npos)
-		return false;
+		return str;
 	return str.replace(start_pos, 1, to);
 }
 
