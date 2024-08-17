@@ -43,7 +43,7 @@ String string_replace_all(String &str, const String &from, const String &to) {
 }
 
 template <typename String>
-String string_replace_all(String &str, String::value_type from, const String &to) {
+String string_replace_all(String &str, String::CharT from, const String &to) {
 	size_t start_pos = 0;
 	while ((start_pos = str.find(from, start_pos)) != String::npos) {
 		str.replace(start_pos, 1, to);
@@ -61,7 +61,7 @@ String string_replace(String &str, const String &from, const String &to) {
 }
 
 template <typename String>
-String string_replace(String &str, String::value_type from, const String &to) {
+String string_replace(String &str, String::CharT from, const String &to) {
 	size_t start_pos = str.find(from);
 	if (start_pos == String::npos)
 		return str;
