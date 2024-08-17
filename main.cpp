@@ -859,7 +859,7 @@ int main(int argc, char **argv) {
 			std::string key = f_ssprintf("%d", 1 + (rand() % ini.GetSectionSize(sect)));
 
 			if (ini.KeyExists(sect.key)) {
-				std::string s = ini.GetValue(sect, key);
+				std::string s = ini.GetValue(sect, key.c_str());
 				std::string delimiter = "::";
 				line1 = trim(s.substr(0, s.find(delimiter)));
 				line2 = trim(s.substr(s.find(delimiter) + 2));
