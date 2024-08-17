@@ -357,12 +357,8 @@ void draw_number(int n, int x, int y) {
 }
 
 void draw_clock(void) {
-	if (ttyclock.option.date && !ttyclock.option.rebound &&
-			strcmp(ttyclock.date.datestr, ttyclock.date.old_datestr) != 0) {
-		clock_move(ttyclock.geo.x,
-				ttyclock.geo.y,
-				ttyclock.geo.w,
-				ttyclock.geo.h);
+	if (ttyclock.option.date && !ttyclock.option.rebound && strcmp(ttyclock.date.datestr, ttyclock.date.old_datestr) != 0) {
+		clock_move(ttyclock.geo.x, ttyclock.geo.y, ttyclock.geo.w, ttyclock.geo.h);
 	}
 
 	/* Draw hour numbers */
@@ -860,12 +856,16 @@ int main(int argc, char **argv) {
 			ini.GetAllSections(sections);
 
 			const char *sect = sections.begin()->pItem; // first section
-			int key = rand() % ini.GetSectionSize(sect);
+			std::string key = f_ssprintf("%d", rand() % ini.GetSectionSize(sect));
 
-			std::string s = ini.GetValue(sect, f_ssprintf("%d", key));
-			std::string delimiter = "::";
-			line1 = trim(s.substr(0, s.find(delimiter)));
-			line2 = trim(s.substr(s.find(delimiter) + 2));
+			if (ini.KeyExists(sect. key) {
+				std::string s = ini.GetValue(sect, f_ssprintf("%d", key + 1));
+				std::string delimiter = "::";
+				line1 = trim(s.substr(0, s.find(delimiter)));
+				line2 = trim(s.substr(s.find(delimiter) + 2));
+			} else {
+				key += "!"
+			}
 
 			selection = std::string("|") + sect + std::string(",") + f_ssprintf("%d", key);
 		}
