@@ -662,6 +662,7 @@ static std::string trim(std::string s) {
 int main(int argc, char **argv) {
 	int c;
 	int refreshrate = 30; /* sec */
+	bool dump = false;
 
 	/* Alloc ttyclock */
 	memset(&ttyclock, 0, sizeof(ttyclock_t));
@@ -679,7 +680,7 @@ int main(int argc, char **argv) {
 
 	atexit(cleanup);
 
-	while ((c = getopt(argc, argv, "iuvsScbtrR:hBxnDC:f:d:T:a:")) != -1) {
+	while ((c = getopt(argc, argv, "iuvsScbtrR:hBwxnDC:f:d:T:a:")) != -1) {
 		switch (c) {
 			case 'h':
 			default:
@@ -701,6 +702,7 @@ int main(int argc, char **argv) {
 					   "    -i            Show some info about tty-clock                 \n"
 					   "    -h            Show this page                                 \n"
 					   "    -D            Hide date                                      \n"
+					   "    -w            Dumps Words-memo                               \n"
 					   "    -B            Enable blinking colon                          \n"
 					   "    -d delay      Set the delay between two redraws of the clock. Default 1s. \n"
 					   "    -a nsdelay    Additional delay between two redraws in nanoseconds. Default 0ns.\n");
@@ -761,6 +763,9 @@ int main(int argc, char **argv) {
 				if (atol(optarg) >= 0 && atol(optarg) < 1000000000)
 					ttyclock.option.nsdelay = atol(optarg);
 				break;
+			case 'w':
+				dump = true;
+				break;
 			case 'x':
 				ttyclock.option.box = true;
 				break;
@@ -793,6 +798,32 @@ int main(int argc, char **argv) {
 
 	CSimpleIniA ini;
 	ini.SetUnicode();
+
+	if (dump) {
+		if (par_easycurl_to_file(WORDSURL, LOCALCACHE)) {
+			SI_Error rc = ini.LoadFile(LOCALCACHE);
+			if (rc < 0) {
+				fprintf(stderr, "%s: unable to load words data (error 0x%X)\n", argv[0], rc);
+				return 1;
+			};
+		} else {
+			if (!file_exists(LOCALCACHE)) {
+				fprintf(stderr, "%s: words file not found\n", argv[0]);
+			}
+			SI_Error rc = ini.LoadFile(LOCALCACHE);
+			if (rc < 0) {
+				fprintf(stderr, "%s: unable to load words data (error 0x%X)\n", argv[0], rc);
+				return 1;
+			};
+		}
+		CSimpleIniA::TNamesDepend sects;
+		ini.GetAllSections(sects);
+		for (CSimpleIniA::TNamesDepend::const_iterator it = sects.begin(); it != sects.end(); ++it) {
+			printf("'%s' = %d values\n", it->pItem, ini.GetSectionSize(it->pItem));
+		}
+		printf("===============");
+		return 0;
+	}
 
 	init();
 	attron(A_BLINK);
