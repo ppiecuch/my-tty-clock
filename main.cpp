@@ -42,9 +42,10 @@ String string_replace_all(String &str, const String &from, const String &to) {
 	return str;
 }
 
-static std::wstring string_replace_all(std::wstring &str, wchar_t from, const std::wstring &to) {
+template <typename String>
+String string_replace_all(String &str, String::char_type from, const String &to) {
 	size_t start_pos = 0;
-	while ((start_pos = str.find(from, start_pos)) != std::wstring::npos) {
+	while ((start_pos = str.find(from, start_pos)) != String::npos) {
 		str.replace(start_pos, 1, to);
 		start_pos += to.length(); // In case 'to' contains 'from', like replacing 'x' with 'yx'
 	}
@@ -59,9 +60,10 @@ String string_replace(String &str, const String &from, const String &to) {
 	return str.replace(start_pos, from.length(), to);
 }
 
-static std::wstring string_replace(std::wstring &str, wchar_t from, const std::wstring &to) {
+template <typename String>
+String string_replace(String &str, String::char_type from, const String &to) {
 	size_t start_pos = str.find(from);
-	if (start_pos == std::string::npos)
+	if (start_pos == String::npos)
 		return str;
 	return str.replace(start_pos, 1, to);
 }
