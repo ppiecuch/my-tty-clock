@@ -483,7 +483,7 @@ void set_center(bool b) {
 	if ((ttyclock.option.center = b)) {
 		ttyclock.option.rebound = false;
 
-		clock_move((LINES / 2 - (ttyclock.geo.h / 2)),
+		clock_move(ttyclock.geo.x,
 				(COLS / 2 - (ttyclock.geo.w / 2)),
 				ttyclock.geo.w,
 				ttyclock.geo.h);
