@@ -121,7 +121,7 @@ std::wstring simplifieDiacritics(const std::wstring &str) {
 	std::wstring ret = str;
 	for (const auto entry : defaultDiacriticsRemovalMap) {
 		for (const auto ch : entry.second) {
-			ret = ret.replace(std::wstring(ch), entry.first);
+			ret = ret.replace(std::wstring(&ch, 1), entry.first);
 		}
 	}
 	return ret;
