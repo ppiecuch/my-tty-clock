@@ -965,7 +965,7 @@ int main(int argc, char **argv) {
 		bool print = false;
 		key_event(print);
 		if (print) {
-			print_memo(line1, line2);
+			print_memo(line1 + "\n", line2 + "\n");
 		}
 	}
 
