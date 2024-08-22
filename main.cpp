@@ -698,7 +698,8 @@ static void print_memo(const std::string &line1, const std::string &line2) {
 	if (ConvertUTF8toWide(line1.c_str(), res))
 		write_file(prnt, res.c_str(), res.size() * sizeof(std::wstring::traits_type::char_type));
 	write_file(prnt, prnt_font3, 3);
-	write_file(prnt, line2.c_str(), line2.size());
+	if (ConvertUTF8toWide(line2.c_str(), res))
+		write_file(prnt, res.c_str(), res.size() * sizeof(std::wstring::traits_type::char_type));
 }
 
 int main(int argc, char **argv) {
