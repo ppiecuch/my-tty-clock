@@ -777,9 +777,9 @@ bool ConvertUTF8toWide(const char *source, std::wstring &result) {
 		result.clear();
 		return true;
 	}
-	std::vector<wchar_t> &ret;
+	std::vector<wchar_t> ret;
 	if (ConvertUTF8toWide(StringRef(source), ret)) {
-		result = std::wstring(ret.begin(), ret.end());
+		result.assign(ret.begin(), ret.end());
 		return true;
 	}
 	return false;
