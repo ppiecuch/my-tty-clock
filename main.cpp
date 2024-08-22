@@ -676,7 +676,7 @@ bool exec_cmd(const char *cmd, char *result, int result_size) {
 	return true;
 }
 
-static void write_file(const char *path, const char *data, int len) {
+static void write_file(const char *path, const void *data, int len) {
 	if (FILE *ofp = fopen(path, "ab")) {
 		fwrite(data, 1, len, ofp);
 		fflush(ofp);
@@ -691,9 +691,12 @@ static void print_memo(const std::string &line1, const std::string &line2) {
 	const char *prnt_font4 = "\x1d\x21\x04";
 	const char *prnt_font3 = "\x1d\x21\x03";
 
+	std::wstring res;
+
 	write_file(prnt, prnt_uni, 3);
 	write_file(prnt, prnt_font4, 3);
-	write_file(prnt, line1.c_str(), line1.size());
+	if (ConvertUTF8toWide(line1.c_str(), res))
+		write_file(prnt, res.c_str(), res.size());
 	write_file(prnt, prnt_font3, 3);
 	write_file(prnt, line2.c_str(), line2.size());
 }
