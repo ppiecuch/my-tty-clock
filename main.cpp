@@ -512,7 +512,7 @@ void set_box(bool b) {
 	wrefresh(ttyclock.framewin);
 }
 
-void key_event(void) {
+void key_event(bool &print) {
 	int i, c;
 
 	struct timespec length = { ttyclock.option.delay, ttyclock.option.nsdelay };
@@ -626,6 +626,11 @@ void key_event(void) {
 			init_pair(2, i, ttyclock.bg);
 			break;
 
+		case 'p':
+		case 'P':
+			print = true;
+			break;
+
 		default:
 			pselect(1, &rfds, NULL, NULL, &length, NULL);
 	}
@@ -651,8 +656,45 @@ static std::string trimR(std::string s) {
 	return s;
 }
 
-static std::string trim(std::string s) {
-	return trimL(trimR(s));
+static std::string trim(std::string s) { return trimL(trimR(s)); }
+
+bool exec_cmd(const char *cmd, char *result, int result_size) {
+	FILE *fp = popen(cmd, "r");
+
+	if (fgets(result, result_size - 1, fp) == 0) {
+		pclose(fp);
+		return false;
+	}
+
+	size_t len = strlen(result);
+
+	if (result[len - 1] < ' ') {
+		result[len - 1] = '\0';
+	}
+
+	pclose(fp);
+	return true;
+}
+
+static void write_file(const char *path, const char *data, int len) {
+	if (FILE *ofp = fopen(path, "wb")) {
+		fwrite(data, 1, len, ofp);
+		fclose(ofp);
+	}
+}
+
+static print_memo(const std::string &line1, const std::string &line2) {
+	const char *prnt = "/tmp/DEVTERM_PRINTER_IN";
+
+	const char *prnt_uni = "\x1b\x21\x1";
+	const char *prnt_font4 = "\x1d\x21\x4";
+	const char *prnt_font3 = "\x1d\x21\x3";
+
+	write_file(prnt, prnt_uni, 3);
+	write_file(prnt, prnt_font4, 3);
+	write_file(prnt, line1.c_str(), line1.size());
+	write_file(prnt, prnt_font3, 3);
+	write_file(prnt, line2.c_str(), line2.size());
 }
 
 int main(int argc, char **argv) {
@@ -690,6 +732,7 @@ int main(int argc, char **argv) {
 					   "    -t            Set the hour in 12h format                     \n"
 					   "    -u            Use UTC time                                   \n"
 					   "    -T tty        Display the clock on the specified terminal    \n"
+					   "    -p            Print current memo                             \n"
 					   "    -R            Words-memo display refresh rate                \n"
 					   "    -r            Do rebound the clock                           \n"
 					   "    -f format     Set the date format                            \n"
@@ -768,8 +811,7 @@ int main(int argc, char **argv) {
 			case 'T': {
 				struct stat sbuf;
 				if (stat(optarg, &sbuf) == -1) {
-					fprintf(stderr, "words-memo: error: couldn't stat '%s': %s.\n",
-							optarg, strerror(errno));
+					fprintf(stderr, "words-memo: error: couldn't stat '%s': %s.\n", optarg, strerror(errno));
 					exit(EXIT_FAILURE);
 				} else if (!S_ISCHR(sbuf.st_mode)) {
 					fprintf(stderr, "words-memo: error: '%s' doesn't appear to be a character device.\n", optarg);
@@ -835,10 +877,12 @@ int main(int argc, char **argv) {
 	wrefresh(memo);
 
 	setlocale(LC_ALL, "");
+	srand(time(NULL));
 
 	while (ttyclock.running) {
 		if (!file_exists(LOCALCACHE) || ini.GetSectionsSize() == 0 || fileEdge > 900) {
 			if (par_easycurl_to_file(WORDSURL, LOCALCACHE)) {
+				ini = CSimpleIniA();
 				SI_Error rc = ini.LoadFile(LOCALCACHE);
 				if (rc < 0) {
 					fprintf(stderr, "%s: unable to load words data (error 0x%X)\n", argv[0], rc);
@@ -899,7 +943,11 @@ int main(int argc, char **argv) {
 			stats.insert(stats.end(), COLS - stats.size(), ' ');
 		mvwaddstr(status, 0, 0, stats.c_str());
 		wrefresh(status);
-		key_event();
+		bool print = false;
+		key_event(print);
+		if (print) {
+			print_memo(line1, line2);
+		}
 	}
 
 	endwin();
