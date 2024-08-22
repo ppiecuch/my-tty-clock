@@ -686,9 +686,9 @@ static void write_file(const char *path, const char *data, int len) {
 static void print_memo(const std::string &line1, const std::string &line2) {
 	const char *prnt = "/tmp/DEVTERM_PRINTER_IN";
 
-	const char *prnt_uni = "\x1b\x21\x1";
-	const char *prnt_font4 = "\x1d\x21\x4";
-	const char *prnt_font3 = "\x1d\x21\x3";
+	const char *prnt_uni = "\x1b\x21\x01";
+	const char *prnt_font4 = "\x1d\x21\x04";
+	const char *prnt_font3 = "\x1d\x21\x03";
 
 	write_file(prnt, prnt_uni, 3);
 	write_file(prnt, prnt_font4, 3);
