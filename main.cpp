@@ -692,15 +692,13 @@ static void print_memo(const std::string &line1, const std::string &line2) {
 	const char *prnt_font4 = "\x1d\x21\x04";
 	const char *prnt_font3 = "\x1d\x21\x03";
 
-	std::vector<uint16_t> res;
-
 	write_file(prnt, prnt_uni, 3);
 	write_file(prnt, prnt_font4, 3);
-	if (!line1.empty() && ConvertUTF8toWide(line1.c_str(), res))
-		write_file(prnt, res.data(), res.size() * sizeof(uint16_t));
+	if (!line1.empty())
+		write_file(prnt, line1.c_str(), line1.size());
 	write_file(prnt, prnt_font3, 3);
-	if (!line2.empty() && ConvertUTF8toWide(line2.c_str(), res))
-		write_file(prnt, res.data(), res.size() * sizeof(uint16_t));
+	if (!line2.empty())
+		write_file(prnt, line2.c_str(), line2.size());
 }
 
 int main(int argc, char **argv) {
