@@ -679,6 +679,7 @@ bool exec_cmd(const char *cmd, char *result, int result_size) {
 static void write_file(const char *path, const char *data, int len) {
 	if (FILE *ofp = fopen(path, "ab")) {
 		fwrite(data, 1, len, ofp);
+		fflush(ofp);
 		fclose(ofp);
 	}
 }
