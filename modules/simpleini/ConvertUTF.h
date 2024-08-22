@@ -134,6 +134,7 @@ Boolean isLegalUTF8Sequence(const UTF8 *source, const UTF8 *sourceEnd);
 #ifdef __cplusplus
 
 #include <string>
+#include <vector>
 
 bool ConvertUTF8toWide(const char *source, std::wstring &result);
 

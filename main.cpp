@@ -19,6 +19,7 @@
 #include <map>
 #include <sstream>
 #include <string>
+#include <vector>
 
 #define WORDSURL "https://raw.githubusercontent.com/ppiecuch/shared-assets/master/words.txt"
 #define LOCALCACHE "/tmp/words-memo.txt"
@@ -691,15 +692,15 @@ static void print_memo(const std::string &line1, const std::string &line2) {
 	const char *prnt_font4 = "\x1d\x21\x04";
 	const char *prnt_font3 = "\x1d\x21\x03";
 
-	std::wstring res;
+	std::vector<utin16_t> res;
 
 	write_file(prnt, prnt_uni, 3);
 	write_file(prnt, prnt_font4, 3);
 	if (!line1.empty() && ConvertUTF8toWide(line1.c_str(), res))
-		write_file(prnt, res.c_str(), res.size() * sizeof(std::wstring::traits_type::char_type));
+		write_file(prnt, res.data(), res.size() * sizeof(uint16_t));
 	write_file(prnt, prnt_font3, 3);
 	if (!line2.empty() && ConvertUTF8toWide(line2.c_str(), res))
-		write_file(prnt, res.c_str(), res.size() * sizeof(std::wstring::traits_type::char_type));
+		write_file(prnt, res.c_str(), res.size() * sizeof(uint16_t));
 }
 
 int main(int argc, char **argv) {

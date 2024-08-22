@@ -733,8 +733,7 @@ static bool ConvertUTF8toWide(unsigned wideCharWidth, const StringRef &source, c
 		}
 	} else if (wideCharWidth == 2) {
 		const UTF8 *sourceStart = (const UTF8 *)source.data();
-		// FIXME: Make the type of the result buffer correct instead of
-		// using reinterpret_cast.
+		// FIXME: Make the type of the result buffer correct instead of using reinterpret_cast.
 		UTF16 *targetStart = reinterpret_cast<UTF16 *>(resultPtr);
 		ConversionFlags flags = strictConversion;
 		result = ConvertUTF8toUTF16(&sourceStart, sourceStart + source.size(), &targetStart, targetStart + source.size(), flags);
@@ -744,8 +743,7 @@ static bool ConvertUTF8toWide(unsigned wideCharWidth, const StringRef &source, c
 			errorPtr = sourceStart;
 	} else if (wideCharWidth == 4) {
 		const UTF8 *sourceStart = (const UTF8 *)source.data();
-		// FIXME: Make the type of the result buffer correct instead of
-		// using reinterpret_cast.
+		// FIXME: Make the type of the result buffer correct instead of using reinterpret_cast.
 		UTF32 *targetStart = reinterpret_cast<UTF32 *>(resultPtr);
 		ConversionFlags flags = strictConversion;
 		result = ConvertUTF8toUTF32(&sourceStart, sourceStart + source.size(), &targetStart, targetStart + source.size(), flags);
@@ -758,22 +756,36 @@ static bool ConvertUTF8toWide(unsigned wideCharWidth, const StringRef &source, c
 	return result == conversionOK;
 }
 
-static bool ConvertUTF8toWide(const StringRef &source, std::wstring &result) {
+template <typename Element>
+bool ConvertUTF8toWide(const StringRef &source, std::vector<Element> &result) {
 	// Even in the case of UTF-16, the number of bytes in a UTF-8 string is
 	// at least as large as the number of elements in the resulting wide
 	// string, because surrogate pairs take at least 4 bytes in UTF-8.
 	result.resize(source.size() + 1);
 	char *resultPtr = reinterpret_cast<char *>(&result[0]);
 	const UTF8 *errorPtr;
-	if (!ConvertUTF8toWide(sizeof(wchar_t), source, resultPtr, errorPtr)) {
+	if (!ConvertUTF8toWide(sizeof(result[0]), source, resultPtr, errorPtr)) {
 		result.clear();
 		return false;
 	}
-	result.resize(reinterpret_cast<wchar_t *>(resultPtr) - &result[0]);
+	result.resize(reinterpret_cast<Element *>(resultPtr) - &result[0]);
 	return true;
 }
 
 bool ConvertUTF8toWide(const char *source, std::wstring &result) {
+	if (!source) {
+		result.clear();
+		return true;
+	}
+	std::vector<wchar_t> &ret;
+	if (ConvertUTF8toWide(StringRef(source), ret)) {
+		result = std::wstring(ret.begin(), ret.end());
+		return true;
+	}
+	return false;
+}
+
+bool ConvertUTF8toWide(const char *source, std::vector<uint16_t> &result) {
 	if (!source) {
 		result.clear();
 		return true;
