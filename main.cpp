@@ -683,7 +683,7 @@ static void write_file(const char *path, const char *data, int len) {
 	}
 }
 
-static print_memo(const std::string &line1, const std::string &line2) {
+static void print_memo(const std::string &line1, const std::string &line2) {
 	const char *prnt = "/tmp/DEVTERM_PRINTER_IN";
 
 	const char *prnt_uni = "\x1b\x21\x1";
