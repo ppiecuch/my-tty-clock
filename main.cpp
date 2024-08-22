@@ -679,7 +679,7 @@ bool exec_cmd(const char *cmd, char *result, int result_size) {
 }
 
 static bool write_file(const char *path, const void *data, int len) {
-	int fd = open(path, O_APPEND);
+	int fd = open(path, O_APPEND | O_BINARY);
 
 	if (fd == -1) {
 		return false;
