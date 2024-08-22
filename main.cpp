@@ -3,6 +3,7 @@
  *      Main file.
  */
 
+#include <sys/fcntl.h>
 #define _X_OPEN_SOURCE_EXTENDED
 
 #include <fcntl.h>
@@ -679,7 +680,7 @@ bool exec_cmd(const char *cmd, char *result, int result_size) {
 }
 
 static bool write_file(const char *path, const void *data, int len) {
-	int fd = open(path, O_WRONLY);
+	int fd = open(path, O_WRONLY | O_APPEND);
 
 	if (fd == -1) {
 		return false;
