@@ -677,12 +677,14 @@ bool exec_cmd(const char *cmd, char *result, int result_size) {
 	return true;
 }
 
-static void write_file(const char *path, const void *data, int len) {
+static bool write_file(const char *path, const void *data, int len) {
+	size_t n = 0;
 	if (FILE *ofp = fopen(path, "wb")) {
-		fwrite(data, 1, len, ofp);
+		n = fwrite(data, 1, len, ofp);
 		fflush(ofp);
 		fclose(ofp);
 	}
+	return (n == len);
 }
 
 static void print_memo(const std::string &line1, const std::string &line2) {
