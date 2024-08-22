@@ -695,10 +695,10 @@ static void print_memo(const std::string &line1, const std::string &line2) {
 
 	write_file(prnt, prnt_uni, 3);
 	write_file(prnt, prnt_font4, 3);
-	if (ConvertUTF8toWide(line1.c_str(), res))
+	if (!line1.empty() && ConvertUTF8toWide(line1.c_str(), res))
 		write_file(prnt, res.c_str(), res.size() * sizeof(std::wstring::traits_type::char_type));
 	write_file(prnt, prnt_font3, 3);
-	if (ConvertUTF8toWide(line2.c_str(), res))
+	if (!line2.empty() && ConvertUTF8toWide(line2.c_str(), res))
 		write_file(prnt, res.c_str(), res.size() * sizeof(std::wstring::traits_type::char_type));
 }
 
