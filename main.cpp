@@ -700,7 +700,7 @@ static void print_memo(const std::string &line1, const std::string &line2) {
 		write_file(prnt, res.data(), res.size() * sizeof(uint16_t));
 	write_file(prnt, prnt_font3, 3);
 	if (!line2.empty() && ConvertUTF8toWide(line2.c_str(), res))
-		write_file(prnt, res.c_str(), res.size() * sizeof(uint16_t));
+		write_file(prnt, res.data(), res.size() * sizeof(uint16_t));
 }
 
 int main(int argc, char **argv) {
