@@ -5,6 +5,7 @@
 
 #define _X_OPEN_SOURCE_EXTENDED
 
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
