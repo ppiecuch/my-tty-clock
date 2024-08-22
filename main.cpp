@@ -882,7 +882,6 @@ int main(int argc, char **argv) {
 	while (ttyclock.running) {
 		if (!file_exists(LOCALCACHE) || ini.GetSectionsSize() == 0 || fileEdge > 900) {
 			if (par_easycurl_to_file(WORDSURL, LOCALCACHE)) {
-				ini = CSimpleIniA();
 				SI_Error rc = ini.LoadFile(LOCALCACHE);
 				if (rc < 0) {
 					fprintf(stderr, "%s: unable to load words data (error 0x%X)\n", argv[0], rc);
