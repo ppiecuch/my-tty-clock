@@ -692,7 +692,7 @@ static void print_memo(const std::string &line1, const std::string &line2) {
 	const char *prnt_font4 = "\x1d\x21\x04";
 	const char *prnt_font3 = "\x1d\x21\x03";
 
-	std::vector<utin16_t> res;
+	std::vector<uint16_t> res;
 
 	write_file(prnt, prnt_uni, 3);
 	write_file(prnt, prnt_font4, 3);
