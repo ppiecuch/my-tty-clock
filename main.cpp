@@ -677,12 +677,26 @@ bool exec_cmd(const char *cmd, char *result, int result_size) {
 	return true;
 }
 
-static void write_file(const char *path, const void *data, int len) {
-	if (FILE *ofp = fopen(path, "wb")) {
-		fwrite(data, 1, len, ofp);
-		fflush(ofp);
-		fclose(ofp);
+static bool write_file(const char *path, const void *data, int len) {
+	int fd = open(path, O_APPEND);
+
+	if (fd == -1) {
+		return false;
 	}
+
+	if (len > 0) {
+		const uint8_t *buf = (const uint8_t *)data;
+		for (size_t size_left = len; size_left > 0;) {
+			ssize_t n = write(fd, buf, size_left);
+			if (n <= 0)
+				break; /* status is okay but we need to check num written parameter */
+			size_left -= n;
+			buf += n;
+		}
+	}
+
+	close(fd);
+	return true;
 }
 
 static void print_memo(const std::string &line1, const std::string &line2) {
