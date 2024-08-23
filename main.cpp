@@ -690,10 +690,37 @@ static bool write_file(const char *path, const void *data, int len) {
 static void print_memo(const std::string &line1, const std::string &line2) {
 	const char *prnt = "/tmp/DEVTERM_PRINTER_IN";
 
+#define ASCII_ESC 27 // Escape //0x1b
+#define ASCII_FS 28 // Field separator//0x1c
+#define ASCII_GS 29 // Group separator //0x1d
+
+#define MAX_DOTS 384
+#define MAX_BYTES (384 / 8)
+
+	const char *prnt_image = "\x1d\x76\x30"; // GS v 0 p wL wH hL hH d1…dk
+	const char *prnt_grey_image = "\x1d\x76\x31"; // GS v 1 p wL wH hL hH d1…dk
+
 	const char *prnt_uni = "\x1b\x21\x01";
 	const char *prnt_font4 = "\x1d\x21\x04";
 	const char *prnt_font3 = "\x1d\x21\x03";
 
+	uint8_t div_hdr[5] = {
+		0,
+		MAX_DOTS / 8, // wL
+		0, // wH
+		1, // hL
+		0, // hH
+	};
+	uint8_t div_data[MAX_BYTES];
+	memset(div_data, 0x0f, MAX_BYTES);
+
+	// divider
+	write_file(prnt, prnt_image, 3);
+	write_file(prnt, div_hdr, 5);
+	write_file(prnt, div_data, MAX_BYTES);
+	write_file(prnt, "\n", 1);
+
+	// memo-card
 	write_file(prnt, prnt_uni, 3);
 	write_file(prnt, prnt_font4, 3);
 	if (!line1.empty())
