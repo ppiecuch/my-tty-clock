@@ -697,7 +697,7 @@ typedef struct {
 	int size, width, height, channels;
 } embed_image_t;
 
-static const static embed_image_t dividers[] = {
+const static embed_image_t dividers[] = {
 	{ "BannersandDividers-3.png", div1, 16896, 384, 44, 1 },
 	{ "BannersandDividers-6.png", div2, 14976, 384, 39, 1 },
 	{ nullptr, nullptr, 0, 0, 0, 0 }
