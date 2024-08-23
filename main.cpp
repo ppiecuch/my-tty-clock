@@ -694,12 +694,12 @@ extern const unsigned char
 typedef struct {
 	const char *image;
 	const unsigned char *pixels;
-	int size, width, height, channels;
+	int size, width, height, bpp;
 } embed_image_t;
 
 const static embed_image_t dividers[] = {
-	{ "BannersandDividers-3.png", div1, 2242, 384, 44, 1 },
-	{ "BannersandDividers-6.png", div2, 2002, 384, 39, 1 },
+	{ "BannersandDividers-3.png", div1, 2112, 384, 44, 1 },
+	{ "BannersandDividers-6.png", div2, 1872, 384, 39, 1 },
 	{ nullptr, nullptr, 0, 0, 0, 0 }
 };
 
