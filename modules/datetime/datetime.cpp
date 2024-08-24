@@ -633,7 +633,7 @@ void cron::set_field(field_name const nfield, std::string first, bool v) {
 		else {
 			set_bit(field_name(nfield), field_size[nfield] - 1, v);
 			if (nfield == field_name::day_of_month)
-				_lastIsSet = true;
+				_last_is_set = true;
 		}
 	} else if (first.compare("W") == 0) {
 		if (nfield != field_name::day_of_week)
