@@ -945,6 +945,7 @@ int main(int argc, char **argv) {
 			curr %= seq.size();
 			return seq[curr++];
 		}
+		bool empty() const { return seq.empty(); }
 	} seq;
 
 	while (ttyclock.running) {
