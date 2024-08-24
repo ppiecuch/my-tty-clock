@@ -233,23 +233,23 @@ API_CALL class cron : std::bitset<field_name::expr> {
 
 public:
 	inline const std::string expression(void) { return _expression; };
-	inline const bool error(void) { return convError(); };
+	inline const bool error(void) { return conv_error(); };
 
 	inline cron &clear(void) {
 		for (byte i(0); i < field_name::expr; i++)
 			set(i, false);
 		_expression.clear();
 		_lastIsSet = false;
-		convError(true);
+		conv_error(true);
 		return *this;
 	};
 	cron &assign(std::string s);
 	inline cron &operator=(std::string s) { return assign(s); };
 
-	inline const time_t next_date(std::tm *t) { return dateAround(*t); };
-	inline const time_t next_date(const time_t *rawtime) { return nextDate(localtime(rawtime)); };
-	inline const time_t next_date(const time_t &rawtime) { return nextDate(localtime(&rawtime)); };
-	inline const time_t previous_date(std::tm *t) { return dateAround(*t, false); };
+	inline const time_t next_date(std::tm *t) { return date_around(*t); };
+	inline const time_t next_date(const time_t *rawtime) { return next_date(localtime(rawtime)); };
+	inline const time_t next_date(const time_t &rawtime) { return next_date(localtime(&rawtime)); };
+	inline const time_t previous_date(std::tm *t) { return date_around(*t, false); };
 	inline const time_t previous_date(const time_t *rawtime) { return previous_date(localtime(rawtime)); };
 	inline const time_t previous_date(const time_t &rawtime) { return previous_date(localtime(&rawtime)); };
 
