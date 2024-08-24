@@ -70,14 +70,14 @@ public:
 	datetime(datetime &&other) noexcept; // Move constructor
 	datetime &operator=(datetime &&other) noexcept; // Move assignement
 	virtual ~datetime();
-	DATETIME_API friend std::ostream &operator<<(std::ostream &os, const datetime &dt);
-	DATETIME_API friend bool operator<(const datetime &mdt, const datetime &odt);
-	DATETIME_API friend bool operator>(const datetime &mdt, const datetime &odt);
-	DATETIME_API friend bool operator<=(const datetime &mdt, const datetime &odt);
-	DATETIME_API friend bool operator>=(const datetime &mdt, const datetime &odt);
-	DATETIME_API friend bool operator==(const datetime &mdt, const datetime &odt);
-	DATETIME_API friend bool operator!=(const datetime &mdt, const datetime &odt);
-	DATETIME_API friend timespan operator-(const datetime &mdt, const datetime &odt);
+	API_CALL friend std::ostream &operator<<(std::ostream &os, const datetime &dt);
+	API_CALL friend bool operator<(const datetime &mdt, const datetime &odt);
+	API_CALL friend bool operator>(const datetime &mdt, const datetime &odt);
+	API_CALL friend bool operator<=(const datetime &mdt, const datetime &odt);
+	API_CALL friend bool operator>=(const datetime &mdt, const datetime &odt);
+	API_CALL friend bool operator==(const datetime &mdt, const datetime &odt);
+	API_CALL friend bool operator!=(const datetime &mdt, const datetime &odt);
+	API_CALL friend timespan operator-(const datetime &mdt, const datetime &odt);
 	std::string to_string() const;
 	std::string to_string(const std::string &format) const;
 	std::string to_shortdate_string() const;
@@ -134,7 +134,7 @@ static const char *month_name[] = { "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "J
 static const byte npos = byte(-1);
 
 API_CALL class cron : std::bitset<field_name::expr> {
-	bool _err, _lastIsSet;
+	bool _err, _last_is_set;
 	ushort _year;
 	std::string _expression;
 
@@ -187,7 +187,7 @@ API_CALL class cron : std::bitset<field_name::expr> {
 				return false;
 		return true;
 	};
-	inline bool is_set(byte const nfield) { return (isSet(field_name(nfield))); };
+	inline bool is_set(byte const nfield) { return (is_set(field_name(nfield))); };
 	inline bool is_not_set(field_name const nfield) {
 		if (existing_field(nfield))
 			for (byte i(index(nfield)), j(i + field_size[nfield]); i < j; i++)
@@ -199,7 +199,7 @@ API_CALL class cron : std::bitset<field_name::expr> {
 		if (!existing_field(nfield))
 			return npos;
 		for (byte i(n); i < field_size[nfield]; i++)
-			if (is_SSet(nfield, i))
+			if (is_set(nfield, i))
 				return (i);
 		return npos;
 	};
@@ -239,7 +239,7 @@ public:
 		for (byte i(0); i < field_name::expr; i++)
 			set(i, false);
 		_expression.clear();
-		_lastIsSet = false;
+		_last_is_set = false;
 		conv_error(true);
 		return *this;
 	};
