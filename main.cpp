@@ -17,6 +17,7 @@
 #include "simpleini/SimpleIni.h"
 
 #include <map>
+#include <numeric>
 #include <sstream>
 #include <string>
 #include <vector>
