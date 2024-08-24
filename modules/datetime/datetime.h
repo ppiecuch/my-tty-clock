@@ -47,12 +47,12 @@ public:
 	int get_total_minutes() const;
 	int get_total_seconds() const;
 	// Operators
-	TIMESPAN_API friend bool operator<(const timespan &mts, const timespan &ots);
-	TIMESPAN_API friend bool operator>(const timespan &mts, const timespan &ots);
-	TIMESPAN_API friend bool operator<=(const timespan &mts, const timespan &ots);
-	TIMESPAN_API friend bool operator>=(const timespan &mts, const timespan &ots);
-	TIMESPAN_API friend bool operator==(const timespan &mts, const timespan &ots);
-	TIMESPAN_API friend bool operator!=(const timespan &mts, const timespan &ots);
+	API_CALL friend bool operator<(const timespan &mts, const timespan &ots);
+	API_CALL friend bool operator>(const timespan &mts, const timespan &ots);
+	API_CALL friend bool operator<=(const timespan &mts, const timespan &ots);
+	API_CALL friend bool operator>=(const timespan &mts, const timespan &ots);
+	API_CALL friend bool operator==(const timespan &mts, const timespan &ots);
+	API_CALL friend bool operator!=(const timespan &mts, const timespan &ots);
 
 private:
 	int days;
