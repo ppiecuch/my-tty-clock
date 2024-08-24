@@ -927,14 +927,35 @@ int main(int argc, char **argv) {
 	setlocale(LC_ALL, "");
 	srand(time(NULL));
 
+	struct seq_t {
+		std::vector<int> seq;
+		int curr = 0;
+		void init(int span) { // reload
+			seq.resize(span);
+			std::iota(seq.begin(), seq.end(), 0);
+			random_shuffle(seq.begin(), seq.end());
+			curr = 0;
+		}
+		void clear() { // reset
+			seq.clear();
+			curr = 0;
+		}
+		int next() { // next element
+			curr %= seq.size();
+			return seq[curr++];
+		}
+	} seq;
+
 	while (ttyclock.running) {
 		if (!file_exists(LOCALCACHE) || ini.GetSectionsSize() == 0 || fileEdge > 900) {
 			if (par_easycurl_to_file(WORDSURL, LOCALCACHE)) {
 				SI_Error rc = ini.LoadFile(LOCALCACHE);
 				if (rc < 0) {
+					endwin();
 					fprintf(stderr, "%s: unable to load words data (error 0x%X)\n", argv[0], rc);
 					return 100;
-				};
+				}
+				seq.clear(); // reset
 			}
 		}
 		clock_rebound();
@@ -947,18 +968,27 @@ int main(int argc, char **argv) {
 			ini.GetAllSections(sections);
 
 			const char *sect = sections.begin()->pItem; // first section
-			std::string key = f_ssprintf("%d", 1 + (rand() % ini.GetSectionSize(sect)));
 
-			if (ini.KeyExists(sect, key.c_str())) {
-				std::string s = ini.GetValue(sect, key.c_str());
-				std::string delimiter = "::";
-				line1 = trim(s.substr(0, s.find(delimiter)));
-				line2 = trim(s.substr(s.find(delimiter) + 2));
+			if (ini.GetSectionSize(sect) > 0) {
+				if (seq.empty()) {
+					seq.init(ini.GetSectionSize(sect));
+				}
+
+				std::string key = f_ssprintf("%d", 1 + seq.next());
+
+				if (ini.KeyExists(sect, key.c_str())) {
+					std::string s = ini.GetValue(sect, key.c_str());
+					std::string delimiter = "::";
+					line1 = trim(s.substr(0, s.find(delimiter)));
+					line2 = trim(s.substr(s.find(delimiter) + 2));
+				} else {
+					key += "!";
+				}
+
+				selection = std::string("|") + sect + std::string(",") + key;
 			} else {
-				key += "!";
+				selection = std::string("|Missing data");
 			}
-
-			selection = std::string("|") + sect + std::string(",") + key;
 		}
 		gettimeofday(&t2, NULL);
 		elapsedTime = t2.tv_sec - t1.tv_sec;
