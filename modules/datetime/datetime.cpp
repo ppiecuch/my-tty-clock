@@ -684,24 +684,24 @@ cron &cron::init_ref(std::tm &timeinfo, int *tminfo[]) {
 
 time_t cron::date_around(const std::tm &timeinfo, bool next) {
 	bool match(true);
-	if (convError())
+	if (conv_error())
 		return time_t(-1);
 	std::tm result(timeinfo);
 	for (byte nfield(0); existing_field(nfield); nfield++) {
 		int delta(0), *tminfo[7];
-		cron &date(initRef(result, tminfo));
+		cron &date(init_ref(result, tminfo));
 		int month_size((nfield == field_name::day_of_month) ? size_of_month(result) : 0);
-		byte i(date.findBit(field_name(nfield), 0)), j(i);
+		byte i(date.find_bit(field_name(nfield), 0)), j(i);
 		if (i == npos)
 			return time_t(-1);
 
-		if (isSet(field_name(nfield)) && !(nfield == field_name::year && match)) {
+		if (is_set(field_name(nfield)) && !(nfield == field_name::year && match)) {
 			tminfo[nfield] = 0;
 			if (nfield < field_name::year)
 				continue;
 		} else
 			while (true) {
-				if (isSet(field_name(nfield), i) || (nfield == field_name::day_of_month && i == month_size - 1 && _last_is_set))
+				if (is_set(field_name(nfield), i) || (nfield == field_name::day_of_month && i == month_size - 1 && _last_is_set))
 					break;
 				delta += (next ? 1 : -1);
 				if (((i += (next ? 1 : -1)) >= (month_size ? month_size : field_size[nfield])))
@@ -724,13 +724,13 @@ time_t cron::date_around(const std::tm &timeinfo, bool next) {
 			} else {
 				*tminfo[nfield] += delta;
 			};
-			while (existingField(--nfield)) {
+			while (existing_field(--nfield)) {
 				month_size = ((nfield == field_name::day_of_month) ? size_of_month(result) : 0);
 				*tminfo[nfield] = (next ? ((nfield == field_name::day_of_month) ? 1 : 0) : (month_size ? month_size : field_size[nfield] - 1));
 			}
 		} else if (nfield == field_name::year && (match || !next)) { // Ref date matchs with cron!...
 			for (nfield = 0; nfield <= field_name::year; nfield++)
-				if (!isSet(nfield)) { // searching for first not "*"
+				if (!is_set(nfield)) { // searching for first not "*"
 					if (next) {
 						if (is_set(nfield, *tminfo[nfield] + (next ? 1 : -1) - (nfield == field_name::day_of_month))) { // previous on cron "* * * A-B(matching) * * * cmd"
 							set_field(nfield, false);
@@ -739,7 +739,7 @@ time_t cron::date_around(const std::tm &timeinfo, bool next) {
 							*tminfo[nfield] += 1;
 						nfield = -2;
 					} else {
-						while (existingField(--nfield))
+						while (existing_field(--nfield))
 							*tminfo[nfield] = 0;
 						nfield = -3;
 						break;
