@@ -931,9 +931,9 @@ int main(int argc, char **argv) {
 	struct seq_t {
 		std::vector<int> seq;
 		int curr = 0;
-		void init(int span) { // reload
+		void init(int span, int start = 0) { // reload
 			seq.resize(span);
-			std::iota(seq.begin(), seq.end(), 0);
+			std::iota(seq.begin(), seq.end(), start);
 			random_shuffle(seq.begin(), seq.end());
 			curr = 0;
 		}
@@ -973,10 +973,10 @@ int main(int argc, char **argv) {
 
 			if (ini.GetSectionSize(sect) > 0) {
 				if (seq.empty()) {
-					seq.init(ini.GetSectionSize(sect));
+					seq.init(ini.GetSectionSize(sect), 1);
 				}
 
-				std::string key = f_ssprintf("%d", 1 + seq.next());
+				std::string key = f_ssprintf("%d", seq.next());
 
 				if (ini.KeyExists(sect, key.c_str())) {
 					std::string s = ini.GetValue(sect, key.c_str());
