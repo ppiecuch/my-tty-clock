@@ -28,10 +28,10 @@ do
   case "$1" in
     -f | --font)
         case "$2" in
-        small) font="24x12" ;;
-        medium) font="28x14" ;;
-        big) font="32x16" ;;
-        *) echo "Ignore parameters: $2"
+          small) font="24x12" ;;
+          medium) font="28x14" ;;
+          big) font="32x16" ;;
+          *) echo "Ignore parameter: $2"
         esac
         shift 2
         ;;
