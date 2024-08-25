@@ -986,7 +986,6 @@ int main(int argc, char **argv) {
 				} else {
 					key += "!";
 				}
-
 				selection = std::string("|") + sect + std::string(",") + key;
 			} else {
 				selection = std::string("|Missing data");
