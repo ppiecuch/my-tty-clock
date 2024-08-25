@@ -19,8 +19,39 @@ if [[ $OSTYPE == "linux-gnu"* ]]; then
 fi
 
 setfont -O previous_font # Store current font
-setfont Uni3-TerminusBold24x12 # Set large font 1st (32x16, 28x14: 480x320+)
 
-./my-words-memo
+
+font="28x14"
+
+while :
+do
+  case "$1" in
+    -f | --font)
+        case "$2" in
+        small) font="24x12" ;;
+        medium) font="28x14" ;;
+        big) font="32x16" ;;
+        *) echo "Ignore parameters: $2"
+        esac
+        shift 2
+        ;;
+    --) # End of all options
+        shift
+        break
+        ;;
+    -*)
+        echo "Error: Unknown option: $1" >&2
+        exit 1
+        ;;
+    *)  # No more options
+        break
+        ;;
+    esac
+done
+
+
+setfont Uni3-TerminusBold$font
+
+./my-words-memo -c
 
 cleanup
