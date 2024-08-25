@@ -27,7 +27,7 @@
     snprintf(_ss_ret, _ss_size+1, ##__VA_ARGS__);       \
     _ss_ret; })
 
-namespace datetime_utils::crontab;
+using namespace datetime_utils::crontab;
 
 // Reference:
 // ----------
