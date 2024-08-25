@@ -946,6 +946,7 @@ int main(int argc, char **argv) {
 			return seq[curr++];
 		}
 		bool empty() const { return seq.empty(); }
+		size_t size() const { return seq.size(); }
 	} seq;
 
 	while (ttyclock.running) {
@@ -957,7 +958,6 @@ int main(int argc, char **argv) {
 					fprintf(stderr, "%s: unable to load words data (error 0x%X)\n", argv[0], rc);
 					return 100;
 				}
-				seq.clear(); // reset
 			}
 		}
 		clock_rebound();
@@ -972,7 +972,7 @@ int main(int argc, char **argv) {
 			const char *sect = sections.begin()->pItem; // first section
 
 			if (ini.GetSectionSize(sect) > 0) {
-				if (seq.empty()) {
+				if (seq.empty() || ini.GetSectionSize(sect) != seq.size()) {
 					seq.init(ini.GetSectionSize(sect), 1);
 				}
 
