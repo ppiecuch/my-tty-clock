@@ -19,7 +19,7 @@ if [[ $OSTYPE == "linux-gnu"* ]]; then
 fi
 
 setfont -O previous_font # Store current font
-setfont Uni3-TerminusBold32x16 # Set large font 1st (480x320+)
+setfont Uni3-TerminusBold24x12 # Set large font 1st (32x16, 28x14: 480x320+)
 
 ./my-words-memo
 
