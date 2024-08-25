@@ -42,10 +42,13 @@ int main(int argc, char **argv) {
 		"* * * 31 * * myCmd5"
 	};
 
+	time_t Now(time(NULL));
 	cron c;
 
-	c.clear() = crontab[i];
-	time_t rawtime = c.next_date(Now);
+	for (int i(0); i < crontab.size(); i++) {
+		c.clear() = crontab[i];
+		time_t rawtime = c.next_date(Now);
+	}
 }
 
 /* Dividers images */
