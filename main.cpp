@@ -1031,7 +1031,7 @@ int main(int argc, char **argv) {
 		if (print) {
 			print_memo(line1 + "\n", line2 + "\n");
 		}
-		if ((next) {
+		if (next) {
 			elapsedTime = refreshrate;
 		}
 	}
