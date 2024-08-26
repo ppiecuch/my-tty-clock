@@ -514,7 +514,7 @@ void set_box(bool b) {
 	wrefresh(ttyclock.framewin);
 }
 
-void key_event(bool &print) {
+void key_event(bool &print, bool &next) {
 	int i, c;
 
 	struct timespec length = { ttyclock.option.delay, ttyclock.option.nsdelay };
@@ -631,6 +631,11 @@ void key_event(bool &print) {
 		case 'p':
 		case 'P':
 			print = true;
+			break;
+
+		case 'n':
+		case 'N':
+			next = true;
 			break;
 
 		default:
@@ -767,7 +772,7 @@ int main(int argc, char **argv) {
 
 	atexit(cleanup);
 
-	while ((c = getopt(argc, argv, "iuvsScbtrR:hBwxnDC:f:d:T:a:")) != -1) {
+	while ((c = getopt(argc, argv, "ikuvsScbtrR:hBwxnDC:f:d:T:a:")) != -1) {
 		switch (c) {
 			case 'h':
 			default:
@@ -1021,10 +1026,13 @@ int main(int argc, char **argv) {
 			stats.insert(stats.end(), COLS - stats.size(), ' ');
 		mvwaddstr(status, 0, 0, stats.c_str());
 		wrefresh(status);
-		bool print = false;
-		key_event(print);
+		bool print = false, next = false;
+		key_event(print, next);
 		if (print) {
 			print_memo(line1 + "\n", line2 + "\n");
+		}
+		if ((next) {
+			elapsedTime = refreshrate;
 		}
 	}
 
