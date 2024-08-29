@@ -49,7 +49,7 @@ int main(int argc, char **argv) {
 
 		char buffer[80];
 		strftime(buffer, 80, "%Y/%m/%d %H:%M:%S", localtime(&rawtime));
-		std::cout << "The job \"" << c.expression() << "\" lanched at: " << rawtime << " (" << buffer << "), - \"" << crontab[i] << "\"" << std::endl;
+		std::cout << "The job \"" << c.expression() << "\" lanched at: " << rawtime << " (" << buffer << "), in " << rawtime - Now << " sec. - \"" << crontab[i] << "\"" << std::endl;
 	}
 }
 
