@@ -30,14 +30,11 @@ using namespace datetime_utils::crontab;
 // Reference:
 // ----------
 // - https://github.com/peychart/croncpp/blob/main/main.cpp
+// - format of a cron string : "S M H d m w [Y] cmd" - (Year is optional; default limit values of the year: +/- 8 years relative to the current year).
 
 int main(int argc, char **argv) {
 	std::vector<std::string> crontab = {
-		"5-55 55 * * apr * myCmd1",
-		"* 25-30 * * * * myCmd2",
-		"*/10 55 * * apr * 2021,2025 myCmd3",
-		"* 05-30 * * * 2-3 * myCmd4",
-		"* * * 31 * * myCmd5"
+		"* */20 * mon,tue,thu,fri * * reqular",
 	};
 
 	time_t Now(time(NULL));
