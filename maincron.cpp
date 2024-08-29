@@ -34,7 +34,7 @@ using namespace datetime_utils::crontab;
 
 int main(int argc, char **argv) {
 	std::vector<std::string> crontab = {
-		"* */20 * mon,tue,thu,fri * * reqular",
+		"* */20 * * * mon,tue,thu,fri reqular",
 	};
 
 	time_t Now(time(NULL));
