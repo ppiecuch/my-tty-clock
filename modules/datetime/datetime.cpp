@@ -651,7 +651,7 @@ void cron::set_field(field_name const nfield, std::string first, bool v) {
 std::string &cron::normalize_field(field_name const nfield, std::string &s) {
 	std::stringstream str(std::stringstream::out);
 	if (field_name(nfield) == field_name::day_of_week) {
-		for (byte i(0); i < 6; i++)
+		for (byte i(0); i < 7; i++)
 			if (to_upper(s).compare(week_day[i]) == 0) {
 				str << i + field_offset[nfield];
 				s.assign(str.str());

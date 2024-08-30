@@ -33,7 +33,7 @@ using namespace datetime_utils::crontab;
 int main(int argc, char **argv) {
 	std::vector<std::string> crontab = {
 		"* */20 9-17 * * mon,tue,thu,fri daily",
-		"* 15 10-18 * * sun weekend1",
+		"* 15 10-18 * * sat weekend1",
 		"* */20 15-17 * * sun weekend2",
 	};
 
