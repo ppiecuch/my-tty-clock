@@ -936,6 +936,7 @@ int main(int argc, char **argv) {
 		}
 		CSimpleIniA::TNamesDepend sects;
 		ini.GetAllSections(sects);
+
 		if (dump_flag) {
 			printf("Sections and keys:\n");
 			printf("==================\n");
@@ -944,7 +945,7 @@ int main(int argc, char **argv) {
 			}
 			printf("==================\n");
 		} else if (print_flag) {
-			const char *sect = sections.begin()->pItem; // first section
+			const char *sect = sects.begin()->pItem; // first section
 
 			if (ini.GetSectionSize(sect) > 0) {
 				if (seq.empty() || ini.GetSectionSize(sect) != seq.size()) {
