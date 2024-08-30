@@ -755,7 +755,7 @@ int main(int argc, char **argv) {
 	int c;
 	int refreshrate = 30; /* sec */
 	bool dump_flag = false, print_flag = false;
-	int print_index = 0;
+	int print_index = -1;
 
 	/* Alloc ttyclock */
 	memset(&ttyclock, 0, sizeof(ttyclock_t));
@@ -857,12 +857,12 @@ int main(int argc, char **argv) {
 				if (atol(optarg) >= 0 && atol(optarg) < 1000000000)
 					ttyclock.option.nsdelay = atol(optarg);
 				break;
-			case 'w':
+			case 'p':
 				print_flag = true;
-				if (atoi(optarg) >= 0)
+				if (atoi(optarg) >= -1)
 					print_index = atoi(optarg);
 				break;
-			case 'p':
+			case 'w':
 				dump_flag = true;
 				break;
 			case 'x':
