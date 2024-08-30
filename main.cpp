@@ -754,7 +754,8 @@ static void print_memo(const std::string &line1, const std::string &line2) {
 int main(int argc, char **argv) {
 	int c;
 	int refreshrate = 30; /* sec */
-	bool dump = false;
+	bool dump_flag = false, print_flag = false;
+	int print_index = 0;
 
 	/* Alloc ttyclock */
 	memset(&ttyclock, 0, sizeof(ttyclock_t));
@@ -772,11 +773,11 @@ int main(int argc, char **argv) {
 
 	atexit(cleanup);
 
-	while ((c = getopt(argc, argv, "ikuvsScbtrR:hBwxnDC:f:d:T:a:")) != -1) {
+	while ((c = getopt(argc, argv, "ikuvsScbtp:rR:hBwxnDC:f:d:T:a:")) != -1) {
 		switch (c) {
 			case 'h':
 			default:
-				printf("usage : tty-clock [-iuvsScbtrahDBxn] [-C [0-7]] [-f format] [-d delay] [-a nsdelay] [-T tty] \n"
+				printf("usage : my-word-memo [-iuvsScbtrahDBxn] [-C [0-7]] [-f format] [-d delay] [-a nsdelay] [-T tty] \n"
 					   "    -s            Show seconds                                   \n"
 					   "    -S            Screensaver mode                               \n"
 					   "    -x            Show box                                       \n"
@@ -786,7 +787,7 @@ int main(int argc, char **argv) {
 					   "    -t            Set the hour in 12h format                     \n"
 					   "    -u            Use UTC time                                   \n"
 					   "    -T tty        Display the clock on the specified terminal    \n"
-					   "    -p            Print current memo                             \n"
+					   "    -p            Print given memo (-1 for random)               \n"
 					   "    -R            Words-memo display refresh rate                \n"
 					   "    -r            Do rebound the clock                           \n"
 					   "    -f format     Set the date format                            \n"
@@ -795,7 +796,7 @@ int main(int argc, char **argv) {
 					   "    -i            Show some info about tty-clock                 \n"
 					   "    -h            Show this page                                 \n"
 					   "    -D            Hide date                                      \n"
-					   "    -w            Dumps Words-memo                               \n"
+					   "    -w            Dumps Words-memo content                       \n"
 					   "    -B            Enable blinking colon                          \n"
 					   "    -d delay      Set the delay between two redraws of the clock. Default 1s. \n"
 					   "    -a nsdelay    Additional delay between two redraws in nanoseconds. Default 0ns.\n");
@@ -857,7 +858,10 @@ int main(int argc, char **argv) {
 					ttyclock.option.nsdelay = atol(optarg);
 				break;
 			case 'w':
-				dump = true;
+				print_flag = true;
+				break;
+			case 'p':
+				dump_flag = true;
 				break;
 			case 'x':
 				ttyclock.option.box = true;
@@ -891,7 +895,29 @@ int main(int argc, char **argv) {
 	CSimpleIniA ini;
 	ini.SetUnicode();
 
-	if (dump) {
+	struct seq_t {
+		std::vector<int> seq;
+		int curr = 0;
+		void init(int span, int start = 0) { // reload
+			srand(time(NULL));
+			seq.resize(span);
+			std::iota(seq.begin(), seq.end(), start);
+			random_shuffle(seq.begin(), seq.end());
+			curr = 0;
+		}
+		void clear() { // reset
+			seq.clear();
+			curr = 0;
+		}
+		int next() { // next element
+			curr %= seq.size();
+			return seq[curr++];
+		}
+		bool empty() const { return seq.empty(); }
+		size_t size() const { return seq.size(); }
+	} seq;
+
+	if (dump_flag || print_flag) {
 		if (par_easycurl_to_file(WORDSURL, LOCALCACHE)) {
 			SI_Error rc = ini.LoadFile(LOCALCACHE);
 			if (rc < 0) {
@@ -910,12 +936,34 @@ int main(int argc, char **argv) {
 		}
 		CSimpleIniA::TNamesDepend sects;
 		ini.GetAllSections(sects);
-		printf("Sections and keys:\n");
-		printf("==================\n");
-		for (CSimpleIniA::TNamesDepend::const_iterator it = sects.begin(); it != sects.end(); ++it) {
-			printf(" %s = %d values\n", it->pItem, ini.GetSectionSize(it->pItem));
+		if (dump_flag) {
+			printf("Sections and keys:\n");
+			printf("==================\n");
+			for (CSimpleIniA::TNamesDepend::const_iterator it = sects.begin(); it != sects.end(); ++it) {
+				printf(" %s = %d values\n", it->pItem, ini.GetSectionSize(it->pItem));
+			}
+			printf("==================\n");
+		} else if (print_flag) {
+			const char *sect = sections.begin()->pItem; // first section
+
+			if (ini.GetSectionSize(sect) > 0) {
+				if (seq.empty() || ini.GetSectionSize(sect) != seq.size()) {
+					seq.init(ini.GetSectionSize(sect), 1);
+				}
+
+				std::string key = f_ssprintf("%d", seq.next());
+
+				if (ini.KeyExists(sect, key.c_str())) {
+					std::string s = ini.GetValue(sect, key.c_str());
+					std::string delimiter = "::";
+					line1 = trim(s.substr(0, s.find(delimiter)));
+					line2 = trim(s.substr(s.find(delimiter) + 2));
+				} else {
+					key += "!";
+				}
+				print_memo(line1, line2);
+			}
 		}
-		printf("==================\n");
 		return 0;
 	}
 
@@ -932,27 +980,6 @@ int main(int argc, char **argv) {
 
 	setlocale(LC_ALL, "");
 	srand(time(NULL));
-
-	struct seq_t {
-		std::vector<int> seq;
-		int curr = 0;
-		void init(int span, int start = 0) { // reload
-			seq.resize(span);
-			std::iota(seq.begin(), seq.end(), start);
-			random_shuffle(seq.begin(), seq.end());
-			curr = 0;
-		}
-		void clear() { // reset
-			seq.clear();
-			curr = 0;
-		}
-		int next() { // next element
-			curr %= seq.size();
-			return seq[curr++];
-		}
-		bool empty() const { return seq.empty(); }
-		size_t size() const { return seq.size(); }
-	} seq;
 
 	while (ttyclock.running) {
 		if (!file_exists(LOCALCACHE) || ini.GetSectionsSize() == 0 || fileEdge > 900) {
