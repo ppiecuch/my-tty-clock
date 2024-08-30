@@ -859,6 +859,8 @@ int main(int argc, char **argv) {
 				break;
 			case 'w':
 				print_flag = true;
+				if (atoi(optarg) >= 0)
+					print_index = atoi(optarg);
 				break;
 			case 'p':
 				dump_flag = true;
