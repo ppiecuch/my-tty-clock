@@ -961,10 +961,8 @@ int main(int argc, char **argv) {
 					std::string delimiter = "::";
 					line1 = trim(s.substr(0, s.find(delimiter)));
 					line2 = trim(s.substr(s.find(delimiter) + 2));
-				} else {
-					key += "!";
+					print_memo(line1, line2);
 				}
-				print_memo(line1, line2);
 			}
 		}
 		return 0;
