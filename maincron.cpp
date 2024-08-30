@@ -15,9 +15,7 @@
 #include <string>
 #include <vector>
 
-#define WORDSURL "https://raw.githubusercontent.com/ppiecuch/shared-assets/master/words.txt"
-#define LOCALCACHE "/tmp/words-memo.txt"
-#define APPVERSION "0.2"
+#define APPVERSION "0.3"
 
 #define f_ssprintf(...) \
 	({ int _ss_size = snprintf(0, 0, ##__VA_ARGS__);    \
@@ -34,19 +32,31 @@ using namespace datetime_utils::crontab;
 
 int main(int argc, char **argv) {
 	std::vector<std::string> crontab = {
-		"* */20 * * * mon,tue,thu,fri reqular",
+		"* */20  9-17 * * mon,tue,thu,fri daily",
+		"*  15  10-18 * sat weekend1",
+		"* */20 15-17 * sun weekend2",
 	};
 
-	time_t Now(time(NULL));
-	cron c;
+	for (;;) {
+		time_t Now(time(NULL));
+		cron c;
 
-	for (int i(0); i < crontab.size(); i++) {
-		c.clear() = crontab[i];
-		time_t rawtime = c.next_date(Now);
+		unsigned pause = 1;
 
-		char buffer[80];
-		strftime(buffer, 80, "%Y/%m/%d %H:%M:%S", localtime(&rawtime));
-		std::cout << "The job \"" << c.expression() << "\" lanched at: " << rawtime << " (" << buffer << "), in " << rawtime - Now << " sec. - \"" << crontab[i] << "\"" << std::endl;
+		for (int i(0); i < crontab.size(); i++) {
+			c.clear() = crontab[i];
+			time_t rawtime = c.next_date(Now);
+
+			char buffer[80];
+			strftime(buffer, 80, "%Y/%m/%d %H:%M:%S", localtime(&rawtime));
+			std::cout << "The job \"" << c.expression() << "\" lanched at: " << rawtime << " (" << buffer << "), in " << rawtime - Now << " sec. - \"" << crontab[i] << "\"" << std::endl;
+			if (rawtime - Now < pause) {
+				pause = rawtime - Now;
+			}
+		}
+
+		std::cout << "Waiting for " << pause << " sec." << std::endl;
+		sleep(pause);
 	}
 }
 

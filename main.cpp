@@ -723,8 +723,9 @@ static void print_memo(const std::string &line1, const std::string &line2) {
 	const char *prnt_grey_image = "\x1d\x76\x31"; // GS v 1 p wL wH hL hH d1…dk
 
 	const char *prnt_uni = "\x1b\x21\x01";
-	const char *prnt_font4 = "\x1d\x21\x04";
+	const char *prnt_ascii = "\x1b\x21\x00";
 	const char *prnt_font3 = "\x1d\x21\x03";
+	const char *prnt_font4 = "\x1d\x21\x04";
 
 	const embed_image_t div = dividers[rand() % 2];
 	uint8_t div_hdr[5] = {
@@ -738,6 +739,19 @@ static void print_memo(const std::string &line1, const std::string &line2) {
 	write_file(prnt, div_hdr, 5);
 	write_file(prnt, div.pixels, div.size);
 	write_file(prnt, "\n", 1);
+
+	// date
+	time_t now(time(NULL));
+	char buffer[80];
+	size_t buffer_sz = strftime(buffer, 80, "%Y/%m/%d %H:%M:%S", localtime(&now));
+
+	write_file(prnt, prnt_ascii, 3);
+	write_file(prnt, prnt_font4, 3);
+	std::string padding;
+	std::fill_n(padding.begin(), (MAX_BYTES - buffer_sz) / 2, ' ');
+	write_file(prnt, padding.c_str(), padding.size());
+	write_file(prnt, buffer, buffer_sz);
+	write_file(prnt, "\n\n", 2);
 
 	// memo-card
 	write_file(prnt, prnt_uni, 3);
