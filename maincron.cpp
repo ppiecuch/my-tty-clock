@@ -41,7 +41,7 @@ int main(int argc, char **argv) {
 		time_t Now(time(NULL));
 		cron c;
 
-		unsigned pause = 1;
+		unsigned pause = 0;
 
 		for (int i(0); i < crontab.size(); i++) {
 			c.clear() = crontab[i];
@@ -50,7 +50,7 @@ int main(int argc, char **argv) {
 			char buffer[80];
 			strftime(buffer, 80, "%Y/%m/%d %H:%M:%S", localtime(&rawtime));
 			std::cout << "The job \"" << c.expression() << "\" lanched at: " << rawtime << " (" << buffer << "), in " << rawtime - Now << " sec. - \"" << crontab[i] << "\"" << std::endl;
-			if (rawtime - Now < pause) {
+			if (!pause || rawtime - Now < pause) {
 				pause = rawtime - Now;
 			}
 		}
