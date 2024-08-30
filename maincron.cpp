@@ -16,6 +16,7 @@
 #include <vector>
 
 #define APPVERSION "0.3"
+#define PRINTCMD "./my-word-memo -p -1"
 
 #define f_ssprintf(...) \
 	({ int _ss_size = snprintf(0, 0, ##__VA_ARGS__);    \
