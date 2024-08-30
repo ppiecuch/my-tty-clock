@@ -919,6 +919,9 @@ int main(int argc, char **argv) {
 		size_t size() const { return seq.size(); }
 	} seq;
 
+	setlocale(LC_ALL, "");
+	srand(time(NULL));
+
 	if (dump_flag || print_flag) {
 		if (par_easycurl_to_file(WORDSURL, LOCALCACHE)) {
 			SI_Error rc = ini.LoadFile(LOCALCACHE);
@@ -978,9 +981,6 @@ int main(int argc, char **argv) {
 	WINDOW *memo = newwin(2, COLS, LINES - 4, 0);
 	wattron(memo, A_BLINK);
 	wrefresh(memo);
-
-	setlocale(LC_ALL, "");
-	srand(time(NULL));
 
 	while (ttyclock.running) {
 		if (!file_exists(LOCALCACHE) || ini.GetSectionsSize() == 0 || fileEdge > 900) {
