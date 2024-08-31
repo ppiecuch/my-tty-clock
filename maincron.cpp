@@ -37,7 +37,7 @@ using namespace datetime_utils::crontab;
 // - https://github.com/peychart/croncpp/blob/main/main.cpp
 // - format of a cron string : "S M H d m w [Y] cmd" - (Year is optional; default limit values of the year: +/- 8 years relative to the current year).
 
-extern char **environ;
+extern "C" char **environ;
 
 int run_cmd(const char *cmd, char *const *args) {
 	pid_t pid;
