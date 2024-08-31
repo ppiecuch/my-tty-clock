@@ -50,9 +50,11 @@ int main(int argc, char **argv) {
 
 			char buffer[80];
 			strftime(buffer, 80, "%Y/%m/%d %H:%M:%S", localtime(&rawtime));
-			std::cout << "The job \"" << c.expression() << "\" lanched at: " << rawtime << " (" << buffer << "), in " << rawtime - Now << " sec. - \"" << crontab[i] << "\"" << std::endl;
-			if (!pause || rawtime - Now < pause) {
-				pause = rawtime - Now;
+			int schedule = rawtime - Now;
+			std::cout << "The job \"" << c.expression() << "\" lanched at: " << rawtime << " (" << buffer << "), in " << schedule << " sec. - \"" << crontab[i] << "\"" << std::endl;
+			if (schedule < 0) {
+			} else if (!pause || schedule < pause) {
+				pause = schedule;
 			}
 		}
 
