@@ -100,7 +100,7 @@ int main(int argc, char **argv) {
 			strftime(buffer, 80, "%Y/%m/%d %H:%M:%S", localtime(&rawtime));
 			int schedule = rawtime - Now;
 			std::cout << "The job \"" << c.expression() << "\" lanched at: " << rawtime << " (" << buffer << "), in " << schedule << " sec. - \"" << crontab[i] << "\"" << std::endl;
-			if (schedule >= -1 && schedule <= 1) {
+			if (schedule >= -2 && schedule <= 2) {
 				run_cmd(PRINTCMD, (char *const *)PRINTARG);
 			} else if (!pause || schedule < pause) {
 				pause = schedule;
@@ -108,7 +108,7 @@ int main(int argc, char **argv) {
 		}
 
 		std::cout << "Waiting for " << pause << " sec." << std::endl;
-		sleep(pause);
+		sleep(pause - 1);
 	}
 }
 
