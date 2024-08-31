@@ -747,9 +747,7 @@ static void print_memo(const std::string &line1, const std::string &line2) {
 
 	write_file(prnt, prnt_ascii, 3);
 	write_file(prnt, prnt_font4, 3);
-	std::string padding;
-	padding.resize(MAX_BYTES);
-	std::fill_n(padding.begin(), (MAX_BYTES - buffer_sz) / 2, ' ');
+	std::string padding(MAX_BYTES, ' ');
 	write_file(prnt, padding.c_str(), padding.size());
 	write_file(prnt, buffer, buffer_sz);
 	write_file(prnt, "\n\n", 2);
