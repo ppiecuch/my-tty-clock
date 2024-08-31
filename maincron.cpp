@@ -21,8 +21,7 @@
 #define APPVERSION "0.4"
 #define APPNAME "main(v" APPVERSION ")"
 
-#define PRINTCMD "my-word-memo"
-#define PRINTARG "-p -1\x00"
+#define PRINTCMD "./my-words-memo\x00-p -1\x00"
 
 #define f_ssprintf(...) \
 	({ int _ss_size = snprintf(0, 0, ##__VA_ARGS__);    \
@@ -101,7 +100,7 @@ int main(int argc, char **argv) {
 			int schedule = rawtime - Now;
 			std::cout << "The job \"" << c.expression() << "\" lanched at: " << rawtime << " (" << buffer << "), in " << schedule << " sec. - \"" << crontab[i] << "\"" << std::endl;
 			if (schedule <= 1 || (Now - c.previous_date(Now)) <= 1) {
-				run_cmd(PRINTCMD, (char *const *)PRINTARG);
+				run_cmd(PRINTCMD, (char *const *)PRINTCMD);
 			} else if (!pause || schedule < pause) {
 				pause = schedule;
 			}
