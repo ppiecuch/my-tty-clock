@@ -86,9 +86,6 @@ int main(int argc, char **argv) {
 	};
 
 	char *exec[] = PRINTCMD;
-	run_cmd(exec);
-	printf("-> %s\n", exec[0]);
-	printf("-> %s\n", exec[1]);
 
 	for (;;) {
 		time_t Now(time(NULL));
