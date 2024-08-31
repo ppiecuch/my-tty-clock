@@ -85,7 +85,7 @@ int main(int argc, char **argv) {
 		"* */20 15-17 * * sun weekend2",
 	};
 
-	char *[] exec = PRINTCMD;
+	char *exec[] = PRINTCMD;
 
 	for (;;) {
 		time_t Now(time(NULL));
