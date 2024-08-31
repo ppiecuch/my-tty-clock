@@ -37,7 +37,7 @@ using namespace datetime_utils::crontab;
 
 extern char **environ;
 
-int run_cmd(const char *cmd, const char *args) {
+int run_cmd(const char *cmd, const char *args[]) {
 	pid_t pid;
 	int status = posix_spawnp(&pid, cmd, nullptr, nullptr, args, environ);
 	if (status == 0) {
