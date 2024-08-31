@@ -85,7 +85,7 @@ int main(int argc, char **argv) {
 		"* */20 15-17 * * sun weekend2",
 	};
 
-	std::vector<char *> exec = PRINTCMD;
+	char *[] exec = PRINTCMD;
 
 	for (;;) {
 		time_t Now(time(NULL));
@@ -102,7 +102,7 @@ int main(int argc, char **argv) {
 			int schedule = rawtime - Now;
 			std::cout << "The job \"" << c.expression() << "\" lanched at: " << rawtime << " (" << buffer << "), in " << schedule << " sec. - \"" << crontab[i] << "\"" << std::endl;
 			if (schedule <= 1 || (Now - c.previous_date(Now)) <= 1) {
-				run_cmd(exec.data());
+				run_cmd(exec);
 			} else if (!pause || schedule < pause) {
 				pause = schedule;
 			}
