@@ -21,7 +21,7 @@
 #define APPVERSION "0.4"
 #define APPNAME "main(v" APPVERSION ")"
 
-#define PRINTCMD { "./my-words-memo", "-p -1", "" }
+#define PRINTCMD { "./my-words-memo", "-p -1", nullptr }
 
 #define f_ssprintf(...) \
 	({ int _ss_size = snprintf(0, 0, ##__VA_ARGS__);    \
