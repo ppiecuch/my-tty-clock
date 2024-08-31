@@ -21,7 +21,7 @@
 #define APPVERSION "0.4"
 #define APPNAME "main(v" APPVERSION ")"
 
-#define PRINTCMD "./my-words-memo\x00-p -1\x00"
+#define PRINTCMD { "./my-words-memo", "-p -1" }
 
 #define f_ssprintf(...) \
 	({ int _ss_size = snprintf(0, 0, ##__VA_ARGS__);    \
@@ -38,9 +38,9 @@ using namespace datetime_utils::crontab;
 
 extern "C" char **environ;
 
-int run_cmd(const char *cmd, char *const *args) {
+int run_cmd(const char *const *args) {
 	pid_t pid;
-	int status = posix_spawnp(&pid, cmd, nullptr, nullptr, args, environ);
+	int status = posix_spawnp(&pid, args[0], nullptr, nullptr, args, environ);
 	if (status == 0) {
 		if (waitpid(pid, &status, 0) != -1) {
 			if (WIFEXITED(status)) {
@@ -100,7 +100,8 @@ int main(int argc, char **argv) {
 			int schedule = rawtime - Now;
 			std::cout << "The job \"" << c.expression() << "\" lanched at: " << rawtime << " (" << buffer << "), in " << schedule << " sec. - \"" << crontab[i] << "\"" << std::endl;
 			if (schedule <= 1 || (Now - c.previous_date(Now)) <= 1) {
-				run_cmd(PRINTCMD, (char *const *)PRINTCMD);
+				const char **args = PRINTCMD;
+				run_cmd(args);
 			} else if (!pause || schedule < pause) {
 				pause = schedule;
 			}
