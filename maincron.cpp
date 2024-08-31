@@ -37,7 +37,7 @@ using namespace datetime_utils::crontab;
 
 extern char **environ;
 
-int run_cmd(const char *cmd, const char *args[]) {
+int run_cmd(const char *cmd, const char **args) {
 	pid_t pid;
 	int status = posix_spawnp(&pid, cmd, nullptr, nullptr, args, environ);
 	if (status == 0) {
@@ -58,7 +58,7 @@ int run_cmd(const char *cmd, const char *args[]) {
 			fprintf(stderr, APPNAME ": waitpid error\n");
 		}
 	} else {
-		fprintf(APPNAME ": posix_spawn: %s\n", strerror(status));
+		fprintf(stderr, APPNAME ": posix_spawn: %s\n", strerror(status));
 	}
 	return -1;
 }
