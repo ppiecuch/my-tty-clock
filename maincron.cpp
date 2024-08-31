@@ -38,7 +38,7 @@ using namespace datetime_utils::crontab;
 
 extern "C" char **environ;
 
-int run_cmd(const char *const *args) {
+int run_cmd(char *const *args) {
 	pid_t pid;
 	int status = posix_spawnp(&pid, args[0], nullptr, nullptr, args, environ);
 	if (status == 0) {
@@ -85,6 +85,8 @@ int main(int argc, char **argv) {
 		"* */20 15-17 * * sun weekend2",
 	};
 
+	std::vector<char *> exec = PRINTCMD;
+
 	for (;;) {
 		time_t Now(time(NULL));
 		cron c;
@@ -100,8 +102,7 @@ int main(int argc, char **argv) {
 			int schedule = rawtime - Now;
 			std::cout << "The job \"" << c.expression() << "\" lanched at: " << rawtime << " (" << buffer << "), in " << schedule << " sec. - \"" << crontab[i] << "\"" << std::endl;
 			if (schedule <= 1 || (Now - c.previous_date(Now)) <= 1) {
-				const char *args[] = PRINTCMD;
-				run_cmd(args);
+				run_cmd(exec.data());
 			} else if (!pause || schedule < pause) {
 				pause = schedule;
 			}

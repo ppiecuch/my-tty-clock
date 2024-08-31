@@ -12,7 +12,7 @@ else
 fi
 
 LIBS="$(ncursesw6-config --libs)"
-OPTS="-I modules -fpermissive"
+OPTS="-I modules"
 
 g++ -g -o my-words-memo $OPTS main.cpp modules/simpleini/ConvertUTF.cpp $CURL $LIBS
 g++ -g -o my-words-memo-cron $OPTS maincron.cpp modules/datetime/datetime.cpp $CURL
