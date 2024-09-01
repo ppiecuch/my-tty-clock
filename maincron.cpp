@@ -81,8 +81,8 @@ std::vector<std::string> read_file(const char *filename) {
 int main(int argc, char **argv) {
 	std::vector<std::string> crontab = {
 		"* */15 9-17 * * mon,tue,thu,fri daily",
-		"* */30 10-18 * * sat weekend1",
-		"* */20 15-17 * * sun weekend2",
+		"* */20 10-18 * * sat weekend1",
+		"* */30 12-18 * * sun weekend2",
 	};
 
 	char *exec[] = PRINTCMD;
@@ -96,20 +96,23 @@ int main(int argc, char **argv) {
 		for (int i(0); i < crontab.size(); i++) {
 			c.clear() = crontab[i];
 			time_t rawtime = c.next_date(Now);
+			int schedule = rawtime - Now;
 
 			char buffer[80];
 			strftime(buffer, 80, "%Y/%m/%d %H:%M:%S", localtime(&rawtime));
-			int schedule = rawtime - Now;
 			std::cout << "The job \"" << c.expression() << "\" lanched at: " << rawtime << " (" << buffer << "), in " << schedule << " sec. - \"" << crontab[i] << "\"" << std::endl;
-			if (schedule <= 1 || (Now - c.previous_date(Now)) <= 1) {
-				run_cmd(exec);
-			} else if (!pause || schedule < pause) {
+
+			if (!pause || schedule < pause) {
 				pause = schedule;
 			}
 		}
 
-		std::cout << "Waiting for " << pause << " sec." << std::endl;
-		sleep(pause - 1);
+		if (pause > 0) {
+			std::cout << "Waiting for " << pause << " sec." << std::endl;
+			sleep(pause);
+		}
+		std::cout << "Executing." << std::endl;
+		run_cmd(exec);
 	}
 }
 
