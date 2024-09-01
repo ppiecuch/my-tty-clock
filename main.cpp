@@ -709,7 +709,7 @@ const static embed_image_t dividers[] = {
 	{ nullptr, nullptr, 0, 0, 0, 0 }
 };
 
-static void print_memo(const std::string &line1, const std::string &line2) {
+static void print_memo(const std::string &line1, const std::string &line2, int d = 0) {
 	const char *prnt = "/tmp/DEVTERM_PRINTER_IN";
 
 #define ASCII_ESC 27 // Escape //0x1b
@@ -727,7 +727,7 @@ static void print_memo(const std::string &line1, const std::string &line2) {
 	const char *prnt_font3 = "\x1d\x21\x03";
 	const char *prnt_font4 = "\x1d\x21\x04";
 
-	const embed_image_t div = dividers[rand() % 2];
+	const embed_image_t div = dividers[d];
 	uint8_t div_hdr[5] = {
 		0,
 		uint8_t(div.width / 8), 0, // wL wH
@@ -747,7 +747,7 @@ static void print_memo(const std::string &line1, const std::string &line2) {
 
 	write_file(prnt, prnt_ascii, 3);
 	write_file(prnt, prnt_font4, 3);
-	std::string padding((MAX_BYTES - buffer_sz)/2, ' ');
+	std::string padding((MAX_BYTES - buffer_sz) / 2, ' ');
 	write_file(prnt, padding.c_str(), padding.size());
 	write_file(prnt, buffer, buffer_sz);
 	write_file(prnt, "\n\n", 2);
@@ -974,7 +974,7 @@ int main(int argc, char **argv) {
 					std::string delimiter = "::";
 					line1 = trim(s.substr(0, s.find(delimiter)));
 					line2 = trim(s.substr(s.find(delimiter) + 2));
-					print_memo(line1 + "\n", line2 + "\n");
+					print_memo(line1 + "\n", line2 + "\n", 1);
 				}
 			}
 		}
