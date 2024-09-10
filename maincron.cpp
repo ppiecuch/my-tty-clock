@@ -70,7 +70,7 @@ std::vector<std::string> read_file(const char *filename) {
 	if (file.is_open()) {
 		std::string line;
 		while (std::getline(file, line)) {
-			if (!line.empty())
+			if (!line.empty() && line[0] != '#')
 				r.push_back(line);
 		}
 		file.close();
