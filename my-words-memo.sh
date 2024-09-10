@@ -53,7 +53,7 @@ done
 setfont Uni3-TerminusBold$font
 
 if [ -f /tmp/words-memo.txt ]; then
-  chmod a+w /tmp/words-memo.txt
+  mv /tmp/words-memo.txt /tmp/words-memo.0.txt
 fi
 
 ./my-words-memo -c
