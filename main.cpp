@@ -784,8 +784,6 @@ int main(int argc, char **argv) {
 	ttyclock.option.nsdelay = 0; /* -0FPS */
 	ttyclock.option.blink = false;
 
-	atexit(cleanup);
-
 	while ((c = getopt(argc, argv, "ikuvsScbtp:rR:hBwxnDC:f:d:T:a:")) != -1) {
 		switch (c) {
 			case 'h':
@@ -933,22 +931,25 @@ int main(int argc, char **argv) {
 	} seq;
 
 	if (dump_flag || print_flag) {
-		if (par_easycurl_to_file(WORDSURL, LOCALCACHE)) {
-			SI_Error rc = ini.LoadFile(LOCALCACHE);
-			if (rc < 0) {
-				fprintf(stderr, "%s: unable to load words data (error 0x%X)\n", argv[0], rc);
-				return 1;
-			};
-		} else {
-			if (!file_exists(LOCALCACHE)) {
-				fprintf(stderr, "%s: words file not found\n", argv[0]);
+		if (!file_exists(LOCALCACHE)) {
+			if (par_easycurl_to_file(WORDSURL, LOCALCACHE)) {
+				SI_Error rc = ini.LoadFile(LOCALCACHE);
+				if (rc < 0) {
+					fprintf(stderr, "%s: unable to load words data (error 0x%X)\n", argv[0], rc);
+					return 1;
+				};
+			} else {
+				if (!file_exists(LOCALCACHE)) {
+					fprintf(stderr, "%s: words file not found\n", argv[0]);
+				}
+				SI_Error rc = ini.LoadFile(LOCALCACHE);
+				if (rc < 0) {
+					fprintf(stderr, "%s: unable to load words data (error 0x%X)\n", argv[0], rc);
+					return 1;
+				};
 			}
-			SI_Error rc = ini.LoadFile(LOCALCACHE);
-			if (rc < 0) {
-				fprintf(stderr, "%s: unable to load words data (error 0x%X)\n", argv[0], rc);
-				return 1;
-			};
 		}
+
 		CSimpleIniA::TNamesDepend sects;
 		ini.GetAllSections(sects);
 
@@ -980,6 +981,8 @@ int main(int argc, char **argv) {
 		}
 		return 0;
 	}
+
+	atexit(cleanup);
 
 	init();
 	attron(A_BLINK);
