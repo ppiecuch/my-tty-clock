@@ -5,6 +5,7 @@
 
 #define _X_OPEN_SOURCE_EXTENDED
 
+#include <ncurses.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -769,6 +770,10 @@ int main(int argc, char **argv) {
 	int refreshrate = 30; /* sec */
 	bool dump_flag = false, print_flag = false;
 	int print_index = -1;
+
+#ifdef DEBUG
+	prctl(PR_SET_DUMPABLE, 1);
+#endif
 
 	/* Alloc ttyclock */
 	memset(&ttyclock, 0, sizeof(ttyclock_t));

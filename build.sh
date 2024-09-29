@@ -13,6 +13,7 @@ fi
 
 LIBS="$(ncursesw6-config --libs)"
 OPTS="-I modules -Wno-write-strings"
+DBG="-g -DDEBUG -D_DEBUG"
 
-g++ -g -o my-words-memo $OPTS main.cpp modules/simpleini/ConvertUTF.cpp $CURL $LIBS
-g++ -g -o my-words-memo-cron $OPTS maincron.cpp modules/datetime/datetime.cpp $CURL
+g++ $DBG -o my-words-memo $OPTS main.cpp modules/simpleini/ConvertUTF.cpp $CURL $LIBS
+g++ $DBG -o my-words-memo-cron $OPTS maincron.cpp modules/datetime/datetime.cpp $CURL
