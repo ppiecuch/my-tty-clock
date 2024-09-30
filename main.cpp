@@ -32,7 +32,7 @@ static bool verbose = false;
 
 #define LOG(fmt, ...) \
 	if (verbose)      \
-	printf("[words-memo] " fmt, __VA_ARGS__)
+	printf("[words-memo] " fmt "\n", __VA_ARGS__)
 
 #define f_ssprintf(...) \
 	({ int _ss_size = snprintf(0, 0, ##__VA_ARGS__);    \
