@@ -28,6 +28,12 @@
 #define LOCALCACHE "/tmp/words-memo.txt"
 #define APPVERSION "0.7"
 
+static bool verbose = false;
+
+#define LOG(fmt, ...) \
+	if (verbose)      \
+	printf("[words-memo] " fmt, __VA_ARGS__)
+
 #define f_ssprintf(...) \
 	({ int _ss_size = snprintf(0, 0, ##__VA_ARGS__);    \
     char *_ss_ret = (char*)alloca(_ss_size+1);          \
@@ -790,7 +796,7 @@ int main(int argc, char **argv) {
 	ttyclock.option.nsdelay = 0; /* -0FPS */
 	ttyclock.option.blink = false;
 
-	while ((c = getopt(argc, argv, "ikuvsScbtp:rR:hBwxnDC:f:d:T:a:")) != -1) {
+	while ((c = getopt(argc, argv, "ikuvsScbtp:rR:hBwxnDC:f:d:T:a:V")) != -1) {
 		switch (c) {
 			case 'h':
 			default:
@@ -809,7 +815,7 @@ int main(int argc, char **argv) {
 					   "    -r            Do rebound the clock                           \n"
 					   "    -f format     Set the date format                            \n"
 					   "    -n            Don't quit on keypress                         \n"
-					   "    -v            Show tty-clock version                         \n"
+					   "    -V            Show tty-clock version                         \n"
 					   "    -i            Show some info about tty-clock                 \n"
 					   "    -h            Show this page                                 \n"
 					   "    -D            Hide date                                      \n"
@@ -827,7 +833,7 @@ int main(int argc, char **argv) {
 			case 'u':
 				ttyclock.option.utc = true;
 				break;
-			case 'v':
+			case 'V':
 				puts("Words-Memo © devel version");
 				exit(EXIT_SUCCESS);
 				break;
@@ -900,6 +906,9 @@ int main(int argc, char **argv) {
 			} break;
 			case 'n':
 				ttyclock.option.noquit = true;
+				break;
+			case 'v':
+				verbose = true;
 				break;
 		}
 	}
@@ -975,6 +984,8 @@ int main(int argc, char **argv) {
 				}
 
 				std::string key = f_ssprintf("%d", seq.next());
+
+				LOG("Print selected key %s", key.c_str());
 
 				if (ini.KeyExists(sect, key.c_str())) {
 					std::string s = ini.GetValue(sect, key.c_str());
