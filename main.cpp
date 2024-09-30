@@ -970,6 +970,12 @@ int main(int argc, char **argv) {
 					return 1;
 				};
 			}
+		} else {
+			SI_Error rc = ini.LoadFile(LOCALCACHE);
+			if (rc < 0) {
+				fprintf(stderr, "%s: unable to load words data (error 0x%X)\n", argv[0], rc);
+				return 1;
+			};
 		}
 
 		CSimpleIniA::TNamesDepend sects;
