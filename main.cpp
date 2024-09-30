@@ -909,7 +909,13 @@ int main(int argc, char **argv) {
 				break;
 			case 'v':
 				verbose = true;
-				LOG("Verbose output enabled (app. version %s, build %s).", APPVERSION, __DATE__);
+				LOG("Verbose output enabled (app. version %s, build %s, debug %s).", APPVERSION, __DATE__,
+#ifdef DEBUG
+						"on"
+#else
+						"off"
+#endif
+				);
 				break;
 		}
 	}
