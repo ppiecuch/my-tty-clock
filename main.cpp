@@ -32,7 +32,7 @@ static bool verbose = false;
 
 #define LOG(fmt, ...) \
 	if (verbose)      \
-	printf("[words-memo] " fmt "\n", __VA_ARGS__)
+	printf("[words-memo] " fmt, __VA_ARGS__)
 
 #define f_ssprintf(...) \
 	({ int _ss_size = snprintf(0, 0, ##__VA_ARGS__);    \
@@ -909,7 +909,7 @@ int main(int argc, char **argv) {
 				break;
 			case 'v':
 				verbose = true;
-				LOG("Verbose output enabled (app. version %s, build %s, debug %s).", APPVERSION, __DATE__,
+				LOG("Verbose output enabled (app. version %s, build %s, debug %s).\n", APPVERSION, __DATE__,
 #ifdef DEBUG
 						"on"
 #else
@@ -998,7 +998,7 @@ int main(int argc, char **argv) {
 
 				std::string key = f_ssprintf("%d", seq.next());
 
-				LOG("Print selected key %s", key.c_str());
+				LOG("Print selected key %s.\n", key.c_str());
 
 				if (ini.KeyExists(sect, key.c_str())) {
 					std::string s = ini.GetValue(sect, key.c_str());
