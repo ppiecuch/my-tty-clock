@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/prctl.h>
+#include <sys/resource.h>
 #include <sys/stat.h>
 #include <time.h>
 #include <unistd.h>
@@ -779,6 +780,9 @@ int main(int argc, char **argv) {
 	int print_index = -1;
 
 #ifdef DEBUG
+	struct rlimit core_limits; // core dumps may be disallowed by parent of this process; change that
+	core_limits.rlim_cur = core_limits.rlim_max = RLIM_INFINITY;
+	setrlimit(RLIMIT_CORE, &core_limits);
 	prctl(PR_SET_DUMPABLE, 1);
 #endif
 
