@@ -2,13 +2,15 @@
 
 set -e
 
-trap cleanup SIGINT
+trap cleanup SIGHUP SIGINT SIGQUIT SIGABRT
 
 cleanup() {
+  if [[ -f previous_font ]]; then
     clear
-    [[ -f previous_font ]] && setfont previous_font
+    setfont previous_font
     rm -f previous_font
-   	setterm --reset
+    setterm --reset
+  fi
 }
 
 if [[ $OSTYPE == "linux-gnu"* ]]; then

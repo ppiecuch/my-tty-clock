@@ -7,6 +7,8 @@
 #include <string>
 #include <vector>
 
+#include "par_easycurl.h"
+
 const std::map<std::string, std::string> lang_codes{
 	{ "af", "Afrikaans" },
 	{ "sq", "Albanian" },
@@ -87,7 +89,7 @@ class GoogleTTS {
 	std::string _outv = "> /tmp/gtts_";
 	std::string _ref = " 'Referer: http://translate.google.com/' ";
 	std::string _agent = " 'User-Agent: stagefright/1.2 (Linux;Android 9.0)' ";
-	std::string _mpv = "mpv";
+	std::string _mpv = "mpg321";
 	std::string _speed = " --speed=";
 	std::string _play = " /tmp/gtts.mp3 1>/dev/null";
 	std::string _cat = "cat /tmp/gtts_*.mp3 > /tmp/gtts.mp3";
