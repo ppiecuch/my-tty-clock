@@ -3,8 +3,6 @@
  *      Main file.
  */
 
-#define _X_OPEN_SOURCE_EXTENDED
-
 #include <ncurses.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -197,6 +195,7 @@ void init(void) {
 
 	cbreak();
 	noecho();
+	nonl();
 	keypad(stdscr, true);
 	start_color();
 	curs_set(false);
