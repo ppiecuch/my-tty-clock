@@ -22,3 +22,4 @@ echo "*==============="
 
 g++ $DBG -o my-words-memo $OPTS main.cpp modules/simpleini/ConvertUTF.cpp $CURL $LIBS
 g++ $DBG -o my-words-memo-cron $OPTS maincron.cpp modules/datetime/datetime.cpp $CURL
+g++ $DBG -o my-words-memo-tts $OPTS maingtts.cpp
