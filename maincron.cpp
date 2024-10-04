@@ -1,5 +1,3 @@
-#define _X_OPEN_SOURCE_EXTENDED
-
 #include <spawn.h>
 #include <stdio.h>
 #include <stdlib.h>
