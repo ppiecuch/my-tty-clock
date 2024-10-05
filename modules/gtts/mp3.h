@@ -27,14 +27,14 @@ struct mad_player_t {
 		static const pa_sample_spec ss = { .format = PA_SAMPLE_S16LE, .rate = 44100, .channels = 2 };
 		if (!(device = pa_simple_new(nullptr, "MP3 player", PA_STREAM_PLAYBACK, nullptr, "playback", &ss, nullptr, nullptr, &error))) {
 			printf("pa_simple_new() failed\n");
-			return 255;
+			return;
 		}
 		// Initialize MAD library
 		mad_stream_init(&mad_stream);
 		mad_synth_init(&mad_synth);
 		mad_frame_init(&mad_frame);
 
-		return 0;
+		init = true;
 	}
 
 	~mad_player_t() {
@@ -47,6 +47,7 @@ struct mad_player_t {
 			if (device)
 				pa_simple_free(device);
 		}
+		init = false;
 	}
 
 	int play(const char *filename) {
@@ -66,7 +67,7 @@ struct mad_player_t {
 			fclose(fp);
 			return 254;
 		}
-		char *input_stream = mmap(0, metadata.st_size, PROT_READ, MAP_SHARED, fd, 0); // Let kernel do all the dirty job of buffering etc, map file contents to memory
+		unsigned char *input_stream = mmap(0, metadata.st_size, PROT_READ, MAP_SHARED, fd, 0); // Let kernel do all the dirty job of buffering etc, map file contents to memory
 		mad_stream_buffer(&mad_stream, input_stream, metadata.st_size); // Copy pointer and length to mad_stream struct
 		while (1) { // Decode frame and synthesize loop
 			// Decode frame from the stream
