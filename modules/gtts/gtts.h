@@ -77,7 +77,7 @@ const std::map<std::string, std::string> lang_codes{
 };
 
 const std::string _curl = "curl ";
-const std::string _Tts = "'https://translate.google.com/translate_tts?ie=UTF-8&q=";
+const std::string _tts = "'https://translate.google.com/translate_tts?ie=UTF-8&q=";
 const std::string _lang_opt = "&tl=";
 const std::string _client = "&client=tw-ob' ";
 const std::string _out = "> /tmp/gtts.mp3";
