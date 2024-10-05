@@ -84,7 +84,7 @@ const std::string _out = "> /tmp/gtts.mp3";
 const std::string _outv = "> /tmp/gtts_";
 const std::string _ref = " 'Referer: http://translate.google.com/' ";
 const std::string _agent = " 'User-Agent: stagefright/1.2 (Linux;Android 9.0)' ";
-const std::string _mpv = "mpg321";
+const std::string _mpv_cmd = "mpg321";
 const std::string _speed_opt = " --speed=";
 const std::string _play = " /tmp/gtts.mp3 1>/dev/null";
 const std::string _cat = "cat /tmp/gtts_*.mp3 > /tmp/gtts.mp3";
@@ -104,6 +104,7 @@ class GoogleTTS {
 	std::string _text = "";
 	std::string _speed = _speed_opt;
 	std::string _lang = _lang_opt;
+	std::string _mpv = _mpv_cmd;
 
 public:
 	static void help();
