@@ -11,6 +11,16 @@
 #include "par_easycurl.h"
 
 int main(int argc, char *argv[]) {
+	std::string argv0 = argv[0];
+	bool verbose = false;
+	if (argc > 1) {
+		if (std::string("-V") == argv[1] || std::string("--verbose") == argv[1]) {
+			verbose = true;
+			argc--;
+			argv++;
+		}
+	}
+
 	switch (argc) {
 		case 2:
 			if (std::string("-h") == argv[1] || std::string("-H") == argv[1] || std::string("--help") == argv[1]) {
@@ -22,15 +32,13 @@ int main(int argc, char *argv[]) {
 			if (std::string("-l") == argv[1] || std::string("--languages") == argv[1]) {
 				GoogleTTS::languages();
 			}
-			if (std::string("-V") == argv[1] || std::string("--verbose") == argv[1]) {
-				GoogleTTS::enable_verbose();
-			}
 			break;
 
 		case 3: {
 			std::string msg(argv[2]);
 			std::string lang(argv[1]);
 			std::unique_ptr<GoogleTTS> tts(new GoogleTTS(msg, lang));
+			tts->setup_verbose(verbose);
 			tts->execute();
 		} break;
 
@@ -39,6 +47,7 @@ int main(int argc, char *argv[]) {
 			std::string lang(argv[1]);
 			std::string speed(argv[3]);
 			std::unique_ptr<GoogleTTS> tts(new GoogleTTS(msg, lang, speed));
+			tts->setup_verbose(verbose);
 			tts->execute();
 		} break;
 
@@ -138,6 +147,7 @@ void GoogleTTS::help() {
 	std::cout << "standard speed is 1.0" << std::endl;
 	std::cout << std::endl;
 	std::cout << "Options:" << std::endl;
+	std::cout << "-V\t\tverbose mode" << std::endl;
 	std::cout << "-h\t\tshows this help" << std::endl;
 	std::cout << "-v\t\tshows program version" << std::endl;
 	std::cout << "-l\t\tshows all available languages" << std::endl;

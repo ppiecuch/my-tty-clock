@@ -1,6 +1,7 @@
 #ifndef GTTS_H
 #define GTTS_H
 
+#include <map>
 #include <string>
 #include <vector>
 
@@ -99,15 +100,14 @@ class GoogleTTS {
 	void replace(std::string &text);
 	void unite();
 
-	static bool verbose = false;
+	bool verbose = false;
 
 public:
 	static void help();
 	static void version();
 	static void languages();
 
-	static void enable_verbose() { verbose = true; }
-	static void disable_verbose() { verbose = false; }
+	void setup_verbose(bool v) { verbose = v; }
 
 	void execute();
 	GoogleTTS(std::string msg, std::string lang, std::string speed = "1.0");
