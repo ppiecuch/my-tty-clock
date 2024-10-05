@@ -67,7 +67,7 @@ struct mad_player_t {
 			fclose(fp);
 			return 254;
 		}
-		unsigned char *input_stream = mmap(0, metadata.st_size, PROT_READ, MAP_SHARED, fd, 0); // Let kernel do all the dirty job of buffering etc, map file contents to memory
+		unsigned char *input_stream = (unsigned char *)mmap(0, metadata.st_size, PROT_READ, MAP_SHARED, fd, 0); // Let kernel do all the dirty job of buffering etc, map file contents to memory
 		mad_stream_buffer(&mad_stream, input_stream, metadata.st_size); // Copy pointer and length to mad_stream struct
 		while (1) { // Decode frame and synthesize loop
 			// Decode frame from the stream
