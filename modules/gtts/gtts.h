@@ -76,20 +76,19 @@ const std::map<std::string, std::string> lang_codes{
 	{ "cy", "Welsh" },
 };
 
-const std::string _curl = "curl ";
-const std::string _tts = "'https://translate.google.com/translate_tts?ie=UTF-8&q=";
-const std::string _lang = "&tl=";
-const std::string _text = "";
-const std::string _client = "&client=tw-ob' ";
-const std::string _out = "> /tmp/gtts.mp3";
-const std::string _outv = "> /tmp/gtts_";
-const std::string _ref = " 'Referer: http://translate.google.com/' ";
-const std::string _agent = " 'User-Agent: stagefright/1.2 (Linux;Android 9.0)' ";
-const std::string _mpv = "mpg321";
-const std::string _speed = " --speed=";
-const std::string _play = " /tmp/gtts.mp3 1>/dev/null";
-const std::string _cat = "cat /tmp/gtts_*.mp3 > /tmp/gtts.mp3";
-const std::string _rm = "rm /tmp/gtts_*.mp3";
+const std::string _CURL = "curl ";
+const std::string _TTS = "'https://translate.google.com/translate_tts?ie=UTF-8&q=";
+const std::string _LANG = "&tl=";
+const std::string _CLIENT = "&client=tw-ob' ";
+const std::string _OUT = "> /tmp/gtts.mp3";
+const std::string _OUTV = "> /tmp/gtts_";
+const std::string _REF = " 'Referer: http://translate.google.com/' ";
+const std::string _AGENT = " 'User-Agent: stagefright/1.2 (Linux;Android 9.0)' ";
+const std::string _MPV = "mpg321";
+const std::string _SPEED = " --speed=";
+const std::string _PLAY = " /tmp/gtts.mp3 1>/dev/null";
+const std::string _CAT = "cat /tmp/gtts_*.mp3 > /tmp/gtts.mp3";
+const std::string _RM = "rm /tmp/gtts_*.mp3";
 
 class GoogleTTS {
 	std::vector<std::string> _cmds;
@@ -101,6 +100,10 @@ class GoogleTTS {
 	void unite();
 
 	bool verbose = false;
+
+	std::string _text = "";
+	std::string _speed = _SPEED;
+	std::string _lang = _LANG;
 
 public:
 	static void help();
