@@ -17,6 +17,7 @@ DBG="-g -DDEBUG -D_DEBUG"
 
 echo "*==============="
 echo "* OPTS = $OPTS"
+echo "* LIBS = $LIBS"
 echo "* DBG = $DBG"
 echo "*==============="
 
