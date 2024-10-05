@@ -1,6 +1,9 @@
 #ifndef GTTS_H
 #define GTTS_H
 
+#include <string>
+#include <vector>
+
 const std::map<std::string, std::string> lang_codes{
 	{ "af", "Afrikaans" },
 	{ "sq", "Albanian" },
