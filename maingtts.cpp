@@ -8,7 +8,6 @@
 #include <vector>
 
 #include "modules/gtts/gtts.h"
-#include "par_easycurl.h"
 
 int main(int argc, char *argv[]) {
 	std::string argv0 = argv[0];
