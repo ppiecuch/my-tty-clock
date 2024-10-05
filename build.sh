@@ -12,7 +12,7 @@ else
 fi
 
 LIBS="$(ncursesw6-config --libs)"
-OPTS="-D_X_OPEN_SOURCE_EXTENDED -D__GNU_SOURCE -D_GNU_SOURCE -I modules -Wno-write-strings"
+OPTS="-std=c++14 -D_X_OPEN_SOURCE_EXTENDED -D__GNU_SOURCE -D_GNU_SOURCE -I modules -Wno-write-strings"
 DBG="-g -DDEBUG -D_DEBUG"
 
 echo "*==============="

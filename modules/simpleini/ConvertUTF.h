@@ -128,7 +128,8 @@ Boolean isLegalUTF8Sequence(const UTF8 *source, const UTF8 *sourceEnd);
 }
 #endif
 
-/************************************************************************* /
+/* --------------------------------------------------------------------- */
+
 /* Below are custom/app-specific wrappers of the functions above. */
 
 #ifdef __cplusplus

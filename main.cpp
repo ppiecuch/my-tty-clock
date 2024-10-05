@@ -7,12 +7,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifndef __APPLE__
 #include <sys/prctl.h>
+#endif
+#include <mad.h>
 #include <sys/resource.h>
+#include <sys/soundcard.h>
 #include <sys/stat.h>
 #include <time.h>
 #include <unistd.h>
 
+#include "gtts/gtts.h"
 #include "main.h"
 #include "par_easycurl.h"
 #include "simpleini/SimpleIni.h"
@@ -75,6 +80,15 @@ String string_replace(String &str, typename String::value_type from, const Strin
 	if (start_pos == String::npos)
 		return str;
 	return str.replace(start_pos, 1, to);
+}
+
+static int create_directory(const char *path) {
+	struct stat st = { 0 };
+	if (stat(path, &st) == -1) {
+		return mkdir(path, 0700);
+	} else {
+		return 1;
+	}
 }
 
 std::wstring simplifieDiacritics(const std::wstring &str) {
@@ -163,6 +177,7 @@ std::wstring simplifieDiacritics(const std::wstring &str) {
 		{ L"x", L"\u0078\u24E7\uFF58\u1E8B\u1E8D" },
 		{ L"y", L"\u0079\u24E8\uFF59\u1EF3\u00FD\u0177\u1EF9\u0233\u1E8F\u00FF\u1EF7\u1E99\u1EF5\u01B4\u024F\u1EFF" },
 		{ L"z", L"\u007A\u24E9\uFF5A\u017A\u1E91\u017C\u017E\u1E93\u1E95\u01B6\u0225\u0240\u2C6C\uA763" },
+		{ L"!", L"\u01CC" },
 	};
 
 	std::wstring ret = str;
@@ -717,6 +732,9 @@ const static embed_image_t dividers[] = {
 	{ nullptr, nullptr, 0, 0, 0, 0 }
 };
 
+static void tss_memo(const std::string &line1, const std::string &line2) {
+}
+
 static void print_memo(const std::string &line1, const std::string &line2, int d = 0) {
 	const char *prnt = "/tmp/DEVTERM_PRINTER_IN";
 
@@ -779,11 +797,15 @@ int main(int argc, char **argv) {
 	int print_index = -1;
 
 #ifdef DEBUG
+#ifndef __APPLE__
 	struct rlimit core_limits; // core dumps may be disallowed by parent of this process; change that
 	core_limits.rlim_cur = core_limits.rlim_max = RLIM_INFINITY;
 	setrlimit(RLIMIT_CORE, &core_limits);
 	prctl(PR_SET_DUMPABLE, 1);
 #endif
+#endif
+
+	create_directory("tts-cache");
 
 	/* Alloc ttyclock */
 	memset(&ttyclock, 0, sizeof(ttyclock_t));
