@@ -18,6 +18,7 @@
 #include <unistd.h>
 
 #include "gtts/gtts.h"
+#include "gtts/mp3.h"
 #include "main.h"
 #include "par_easycurl.h"
 #include "simpleini/SimpleIni.h"
