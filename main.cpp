@@ -571,7 +571,7 @@ std::string key_event() {
 					init_pair(2, i, ttyclock.bg);
 				}
 		}
-		return;
+		return "";
 	}
 
 	std::string r;
@@ -745,7 +745,7 @@ const static embed_image_t dividers[] = {
 	{ nullptr, nullptr, 0, 0, 0, 0 }
 };
 
-static void tss_memo(const std::string &line1, const std::string &line2) {
+static void tts_memo(const std::string &line1, const std::string &line2) {
 }
 
 static void print_memo(const std::string &line1, const std::string &line2, int d = 0) {
