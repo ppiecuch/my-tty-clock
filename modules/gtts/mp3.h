@@ -12,11 +12,11 @@
 #include <string.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
+#include <cstdlib>
 
 struct mad_player_t {
 	pa_simple *device = nullptr;
-	int ret = 1;
-	int error;
+	int ret = 1, error;
 	bool init = false;
 	struct mad_stream mad_stream;
 	struct mad_frame mad_frame;
@@ -53,7 +53,7 @@ struct mad_player_t {
 	int play(const char *filename) {
 		if (!init) {
 			printf("System not initialized.\n");
-			return 1;
+			return EXIT_FAILURE;
 		}
 		// File pointer
 		FILE *fp = fopen(filename, "r");
@@ -65,7 +65,7 @@ struct mad_player_t {
 		} else {
 			printf("Failed to stat %s\n", filename);
 			fclose(fp);
-			return 254;
+			return EXIT_FAILURE;
 		}
 		unsigned char *input_stream = (unsigned char *)mmap(0, metadata.st_size, PROT_READ, MAP_SHARED, fd, 0); // Let kernel do all the dirty job of buffering etc, map file contents to memory
 		mad_stream_buffer(&mad_stream, input_stream, metadata.st_size); // Copy pointer and length to mad_stream struct

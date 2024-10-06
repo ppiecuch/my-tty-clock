@@ -11,6 +11,7 @@
 #include <sys/prctl.h>
 #endif
 #include <mad.h>
+#include <sys/file.h>
 #include <sys/resource.h>
 #include <sys/soundcard.h>
 #include <sys/stat.h>
@@ -83,10 +84,16 @@ String string_replace(String &str, typename String::value_type from, const Strin
 	return str.replace(start_pos, 1, to);
 }
 
-static int create_directory(const char *path) {
+static void touch(const std::string &filename) {
+	int fd = open(filename.c_str(), O_CREAT | O_WRONLY, 0644);
+	if (fd >= 0)
+		close(fd);
+}
+
+static int create_directory(const std::string &path) {
 	struct stat st = { 0 };
-	if (stat(path, &st) == -1) {
-		return mkdir(path, 0700);
+	if (stat(path.c_str(), &st) == -1) {
+		return mkdir(path.c_str(), 0700);
 	} else {
 		return 1;
 	}
@@ -178,7 +185,7 @@ std::wstring simplifieDiacritics(const std::wstring &str) {
 		{ L"x", L"\u0078\u24E7\uFF58\u1E8B\u1E8D" },
 		{ L"y", L"\u0079\u24E8\uFF59\u1EF3\u00FD\u0177\u1EF9\u0233\u1E8F\u00FF\u1EF7\u1E99\u1EF5\u01B4\u024F\u1EFF" },
 		{ L"z", L"\u007A\u24E9\uFF5A\u017A\u1E91\u017C\u017E\u1E93\u1E95\u01B6\u0225\u0240\u2C6C\uA763" },
-		{ L"!", L"\u01CC" },
+		{ L"!", L"\u00A1" },
 	};
 
 	std::wstring ret = str;
@@ -188,6 +195,12 @@ std::wstring simplifieDiacritics(const std::wstring &str) {
 		}
 	}
 	return ret;
+}
+
+std::string trunc_wstring(const std::wstring &wide) {
+	std::string str(wide.length(), 0);
+	std::transform(wide.begin(), wide.end(), str.begin(), [](wchar_t c) { return (char)c; });
+	return str;
 }
 
 void init(void) {
@@ -538,9 +551,7 @@ void set_box(bool b) {
 	wrefresh(ttyclock.framewin);
 }
 
-void key_event(bool &print, bool &next) {
-	int i, c;
-
+std::string key_event() {
 	struct timespec length = { ttyclock.option.delay, ttyclock.option.nsdelay };
 
 	fd_set rfds;
@@ -548,12 +559,12 @@ void key_event(bool &print, bool &next) {
 	FD_SET(STDIN_FILENO, &rfds);
 
 	if (ttyclock.option.screensaver) {
-		c = wgetch(stdscr);
+		int c = wgetch(stdscr);
 		if (c != ERR && ttyclock.option.noquit == false) {
 			ttyclock.running = false;
 		} else {
 			nanosleep(&length, NULL);
-			for (i = 0; i < 8; ++i)
+			for (int i = 0; i < 8; ++i)
 				if (c == (i + '0')) {
 					ttyclock.option.color = i;
 					init_pair(1, ttyclock.bg, i);
@@ -563,7 +574,10 @@ void key_event(bool &print, bool &next) {
 		return;
 	}
 
-	switch (c = wgetch(stdscr)) {
+	std::string r;
+	int i;
+
+	switch (int c = wgetch(stdscr)) {
 		case KEY_RESIZE:
 			endwin();
 			init();
@@ -654,19 +668,17 @@ void key_event(bool &print, bool &next) {
 
 		case 'p':
 		case 'P':
-			print = true;
-			break;
+			r = "print";
 
 		case 'n':
 		case 'N':
-			next = true;
-			break;
+			r = "next";
 
 		default:
 			pselect(1, &rfds, NULL, NULL, &length, NULL);
 	}
 
-	return;
+	return r;
 }
 
 static int file_exists(const char *file) { return (access(file, F_OK) == 0); }
@@ -1088,6 +1100,12 @@ int main(int argc, char **argv) {
 					std::string delimiter = "::";
 					line1 = trim(s.substr(0, s.find(delimiter)));
 					line2 = trim(s.substr(s.find(delimiter) + 2));
+
+					std::wstring res;
+					if (ConvertUTF8toWide(line1.c_str(), res)) {
+						std::string asc = trunc_wstring(simplifieDiacritics(res));
+						touch("tty-cache/" + asc + ".mp3");
+					}
 				} else {
 					key += "!";
 				}
@@ -1126,14 +1144,13 @@ int main(int argc, char **argv) {
 			stats.insert(stats.size(), COLS - stats.size(), ' ');
 		mvwaddstr(status, 0, 0, stats.c_str());
 		wrefresh(status);
-		bool print = false, next = false;
-		key_event(print, next);
-		if (print) {
+		std::string ev = key_event();
+		if (ev == "print")
 			print_memo(line1 + "\n", line2 + "\n");
-		}
-		if (next) {
+		else if (ev == "next")
 			elapsedTime = refreshrate;
-		}
+		else if (ev == "tts")
+			tts_memo(line1, line2);
 	}
 
 	endwin();
