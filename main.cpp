@@ -186,6 +186,8 @@ std::wstring simplifieDiacritics(const std::wstring &str) {
 		{ L"y", L"\u0079\u24E8\uFF59\u1EF3\u00FD\u0177\u1EF9\u0233\u1E8F\u00FF\u1EF7\u1E99\u1EF5\u01B4\u024F\u1EFF" },
 		{ L"z", L"\u007A\u24E9\uFF5A\u017A\u1E91\u017C\u017E\u1E93\u1E95\u01B6\u0225\u0240\u2C6C\uA763" },
 		{ L"!", L"\u00A1" },
+		{ L"?", L"\u00BF" },
+		{ L"..", L"\u1AB4\u2026" },
 	};
 
 	std::wstring ret = str;
