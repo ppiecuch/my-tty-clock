@@ -93,7 +93,7 @@ static void touch(const std::string &filename) {
 static int create_directory(const std::string &path) {
 	struct stat st = { 0 };
 	if (stat(path.c_str(), &st) == -1) {
-		return mkdir(path.c_str(), 0700);
+		return mkdir(path.c_str(), 0755);
 	} else {
 		return 1;
 	}
@@ -1104,7 +1104,7 @@ int main(int argc, char **argv) {
 					std::wstring res;
 					if (ConvertUTF8toWide(line1.c_str(), res)) {
 						std::string asc = trunc_wstring(simplifieDiacritics(res));
-						touch("tty-cache/" + asc + ".mp3");
+						touch("tts-cache/" + asc + ".mp3");
 					}
 				} else {
 					key += "!";
