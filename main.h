@@ -21,6 +21,8 @@
 #include <time.h>
 #include <unistd.h>
 
+#include <string>
+
 /* Macro */
 #define NORMFRAMEW 35
 #define SECFRAMEW 54
@@ -98,7 +100,7 @@ void clock_move(int x, int y, int w, int h);
 void set_second(void);
 void set_center(bool b);
 void set_box(bool b);
-void key_event(void);
+std::string key_event(void);
 
 /* Global variable */
 ttyclock_t ttyclock;
