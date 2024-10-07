@@ -891,6 +891,28 @@ static void print_memo(const std::string &line1, const std::string &line2, int d
 	write_file(prnt, "\n\n\n\n\n\n\n\n\n\n", 10);
 }
 
+static bool tty_is_devpts(const char *tty) {
+	bool retval = false;
+	struct statfs sfs;
+
+#ifndef DEVPTS_SUPER_MAGIC
+#define DEVPTS_SUPER_MAGIC 0x1cd1
+#endif
+
+	if (statfs(tty, &sfs) == 0) {
+		if (sfs.f_type == DEVPTS_SUPER_MAGIC)
+			retval = true;
+	}
+	return retval;
+}
+static int is_console(int fd) {
+	struct vt_mode vt;
+	int ret = ioctl(fd, VT_GETMODE, &vt);
+	return !ret;
+}
+
+static bool is_con = is_console(STDIN_FILENO), is_safe_output = isatty(STDOUT_FILENO) && tty_is_devpts(ttyname(STDOUT_FILENO));
+
 /// BACKGROUND THREADS
 
 struct TimedWaiter {
@@ -928,6 +950,8 @@ void cron_run() {
 		"* */30 12-18 * * sun weekend2",
 	};
 
+	FILE *echo = is_safe_output ? nullptr : freopen("echo.log", "w", stdout); // send output to log file
+
 	printf("Internal cron started with %ld entries.\n", crontab.size());
 
 	while (ttyclock.running) {
@@ -959,6 +983,8 @@ std::string escape(std::string text) {
 }
 
 void tts_run() {
+	FILE *echo = is_safe_output ? nullptr : freopen("echo.log", "w", stdout); // send output to log file
+
 	printf("TTS module started.\n");
 
 	mad_player_t player;
@@ -996,33 +1022,11 @@ void tts_run() {
 
 /// MAIN LOOP
 
-static bool tty_is_devpts(const char *tty) {
-	bool retval = false;
-	struct statfs sfs;
-
-#ifndef DEVPTS_SUPER_MAGIC
-#define DEVPTS_SUPER_MAGIC 0x1cd1
-#endif
-
-	if (statfs(tty, &sfs) == 0) {
-		if (sfs.f_type == DEVPTS_SUPER_MAGIC)
-			retval = true;
-	}
-	return retval;
-}
-static int is_console(int fd) {
-	struct vt_mode vt;
-	int ret = ioctl(fd, VT_GETMODE, &vt);
-	return !ret;
-}
-
 int main(int argc, char **argv) {
 	int c;
 	int refreshrate = 30; /* sec */
 	bool dump_flag = false, print_flag = false;
 	int print_index = -1;
-
-	bool is_con = is_console(STDIN_FILENO), is_safe_output = isatty(STDOUT_FILENO) && tty_is_devpts(ttyname(STDOUT_FILENO));
 
 #ifdef DEBUG
 #ifndef __APPLE__
@@ -1034,10 +1038,6 @@ int main(int argc, char **argv) {
 #endif
 
 	create_directory("tts-cache");
-
-	FILE *echo = nullptr;
-	if (!is_safe_output)
-		echo = freopen("echo.log", "w", stdout); // send output to log file
 
 	/* Alloc ttyclock */
 	memset(&ttyclock, 0, sizeof(ttyclock_t));
@@ -1269,6 +1269,10 @@ int main(int argc, char **argv) {
 		}
 		return 0;
 	}
+
+	FILE *echo = nullptr;
+	if (!is_safe_output)
+		echo = freopen("echo.log", "w", stdout); // send output to log file
 
 	std::thread cron_thrd(cron_run);
 	std::thread tts_thrd(tts_run);
