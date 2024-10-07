@@ -1004,6 +1004,7 @@ void tts_run() {
 					std::vector<const char *> hdrs{ _ref.c_str(), _agent.c_str(), 0 };
 					if (!par_easycurl_to_file_ex(url.c_str(), mp3.c_str(), hdrs.data())) {
 						printf("[words-memo]: download failed\n");
+						printf("[words-memo]: url: %s\n", url.c_str());
 					}
 					if (!file_exists(mp3)) {
 						printf("[words-memo]: words file not found\n");
