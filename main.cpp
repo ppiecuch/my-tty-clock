@@ -45,16 +45,16 @@
 
 static bool verbose = false;
 
-#define LOG(fmt, ...)                                     \
-	if (verbose) {                                        \
-		fprintf(stderr, "[words-memo] " fmt, __VA_ARGS__) \
+#define LOG(fmt, ...)                                        \
+	if (verbose) {                                           \
+		fprintf(stderr, "[words-memo] " fmt, ##__VA_ARGS__); \
 	}
 
 #define INFO(fmt, ...) \
-	fprintf(stderr, "[words-memo] " fmt, __VA_ARGS__)
+	fprintf(stderr, "[words-memo] " fmt, ##__VA_ARGS__)
 
 #define ERROR(fmt, ...) \
-	fprintf(stderr, "[words-memo] " fmt, __VA_ARGS__)
+	fprintf(stderr, "[words-memo] " fmt, ##__VA_ARGS__)
 
 #define f_ssprintf(...) \
 	({ int _ss_size = snprintf(0, 0, ##__VA_ARGS__);    \
