@@ -14,6 +14,7 @@
 #include <mad.h>
 #include <spawn.h>
 #include <sys/file.h>
+#include <sys/ioctl.h>
 #include <sys/resource.h>
 #include <sys/soundcard.h>
 #include <sys/statfs.h>
