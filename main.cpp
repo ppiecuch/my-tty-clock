@@ -974,7 +974,7 @@ void tts_run() {
 				} else {
 					std::string url = _tts + escape(memo) + _lang_opt + "es" + _client;
 					std::vector<const char *> hdrs{ _ref.c_str(), _agent.c_str(), 0 };
-					if (par_easycurl_to_file_ex(url.c_str(), mp3.c_str(), hdrs.const_data())) {
+					if (par_easycurl_to_file_ex(url.c_str(), mp3.c_str(), hdrs.data())) {
 						SI_Error rc = ini.LoadFile(LOCALCACHE);
 						if (rc < 0) {
 							fprintf(stderr, "%s: unable to load words data (error 0x%X)\n", argv[0], rc);
