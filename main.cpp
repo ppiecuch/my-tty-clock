@@ -972,7 +972,7 @@ void tts_run() {
 				if (file_exists(mp3) && !is_mp3(mp3)) {
 					touch(mp3.c_str());
 				} else {
-					std::string url = _tts + escape(memo) + _lang + _client;
+					std::string url = _tts + escape(memo) + _lang_opt + "es" + _client;
 					std::vector<const char *> hdrs{ _ref, _agent, 0 };
 					if (par_easycurl_to_file_ex(url.c_str(), mp3.c_str(), hdrs.const_data())) {
 						SI_Error rc = ini.LoadFile(LOCALCACHE);
