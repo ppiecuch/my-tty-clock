@@ -949,6 +949,15 @@ bool is_mp3(const std::string &filename) {
 	return (buffer[0] == 'I' && buffer[1] == 'D' && buffer[2] == '3') || (buffer[0] == 0xFF && (buffer[1] & 0xE0) == 0xE0);
 }
 
+std::string escape(std::string text) {
+	size_t start_pos = 0;
+	while ((start_pos = text.find(" ", start_pos)) != std::string::npos) {
+		text.replace(start_pos, 1, "%20");
+		start_pos += 3; // Handles case where 'to' is a substring of 'from'
+	}
+	return text;
+}
+
 void tts_run() {
 	printf("TTS module started.\n");
 
@@ -963,12 +972,7 @@ void tts_run() {
 				if (file_exists(mp3) && !is_mp3(mp3)) {
 					touch(mp3.c_str());
 				} else {
-					size_t start_pos = 0;
-					while ((start_pos = memo.find(" ", start_pos)) != std::string::npos) {
-						memo.replace(start_pos, 1, "%20");
-						start_pos += 3; // Handles case where 'to' is a substring of 'from'
-					}
-					std::string url = _tts + _text + _lang + _client;
+					std::string url = _tts + escape(memo) + _lang + _client;
 					std::vector<const char *> hdrs{ _ref, _agent, 0 };
 					if (par_easycurl_to_file_ex(url.c_str(), mp3.c_str(), hdrs.const_data())) {
 						SI_Error rc = ini.LoadFile(LOCALCACHE);
