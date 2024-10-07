@@ -91,6 +91,13 @@ String string_replace(String &str, typename String::value_type from, const Strin
 	return str.replace(start_pos, 1, to);
 }
 
+template <typename T>
+T take(std::vector<T> &in) {
+	T e = in.back();
+	in.pop_back();
+	return e;
+}
+
 static void touch(const std::string &filename) {
 	int fd = open(filename.c_str(), O_CREAT | O_WRONLY, 0644);
 	if (fd >= 0)
@@ -908,8 +915,8 @@ void tts_run() {
 	printf("TTS module started.\n");
 
 	while (ttyclock.running) {
-		if (!tts_events.empty) {
-			std::string memo = tts_events.pop_back();
+		if (!tts_events.empty()) {
+			std::string memo = take(tts_events);
 			std::wstring res;
 			if (ConvertUTF8toWide(memo.c_str(), res)) {
 				std::string asc = trunc_wstring(simplifieDiacritics(res));
