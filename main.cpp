@@ -41,7 +41,7 @@
 
 #define WORDSURL "https://raw.githubusercontent.com/ppiecuch/shared-assets/master/words.txt"
 #define LOCALCACHE "/tmp/words-memo.txt"
-#define APPVERSION "0.7"
+#define APPVERSION "0.9"
 
 struct FILEW {
 	FILE *f = nullptr;
@@ -915,28 +915,6 @@ static void print_memo(const std::string &line1, const std::string &line2, int d
 	write_file(prnt, "\n\n\n\n\n\n\n\n\n\n", 10);
 }
 
-static bool tty_is_devpts(const char *tty) {
-	bool retval = false;
-	struct statfs sfs;
-
-#ifndef DEVPTS_SUPER_MAGIC
-#define DEVPTS_SUPER_MAGIC 0x1cd1
-#endif
-
-	if (statfs(tty, &sfs) == 0) {
-		if (sfs.f_type == DEVPTS_SUPER_MAGIC)
-			retval = true;
-	}
-	return retval;
-}
-static int is_console(int fd) {
-	struct vt_mode vt;
-	int ret = ioctl(fd, VT_GETMODE, &vt);
-	return !ret;
-}
-
-static bool is_con = is_console(STDIN_FILENO), is_safe_output = isatty(STDOUT_FILENO) && tty_is_devpts(ttyname(STDOUT_FILENO));
-
 /// BACKGROUND THREADS
 
 struct TimedWaiter {
@@ -1074,12 +1052,11 @@ int main(int argc, char **argv) {
 	ttyclock.option.nsdelay = 0; /* -0FPS */
 	ttyclock.option.blink = false;
 
-	while ((c = getopt(argc, argv, "FikuvsScbtp:P:rR:hBwxnDC:f:d:T:a:V")) != -1) {
+	while ((c = getopt(argc, argv, "ikuvsScbtp:P:rR:hBwxnDC:f:d:T:a:V")) != -1) {
 		switch (c) {
 			case 'h':
 			default:
-				printf("usage : my-word-memo [-iuvsScbtrahDBxn] [-C [0-7]] [-f format] [-d delay] [-a nsdelay] [-T tty] \n"
-					   "    -F            Force stdout to file (default: echo.log)       \n"
+				printf("usage : my-word-memo [-iuvsScbtrahDBxnV] [-C [0-7]] [-f format] [-d delay] [-a nsdelay] [-T tty] \n"
 					   "    -s            Show seconds                                   \n"
 					   "    -S            Screensaver mode                               \n"
 					   "    -x            Show box                                       \n"
@@ -1186,9 +1163,6 @@ int main(int argc, char **argv) {
 			} break;
 			case 'n':
 				ttyclock.option.noquit = true;
-				break;
-			case 'F':
-				is_safe_output = false;
 				break;
 			case 'v':
 				verbose = true;
