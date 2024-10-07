@@ -10,11 +10,13 @@
 #ifndef __APPLE__
 #include <sys/prctl.h>
 #endif
+#include <linux/vt.h>
 #include <mad.h>
 #include <spawn.h>
 #include <sys/file.h>
 #include <sys/resource.h>
 #include <sys/soundcard.h>
+
 #include <sys/stat.h>
 #include <sys/wait.h>
 #include <time.h>
