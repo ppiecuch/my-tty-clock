@@ -961,6 +961,8 @@ std::string escape(std::string text) {
 void tts_run() {
 	printf("TTS module started.\n");
 
+	mad_player_t player;
+
 	while (ttyclock.running) {
 		if (!tts_events.empty()) {
 			std::string memo = take(tts_events);
@@ -980,12 +982,11 @@ void tts_run() {
 					if (!file_exists(mp3)) {
 						printf("[words-memo]: words file not found\n");
 					} else {
-						// play mp3
+						player.play(mp3.c_str()); // play mp3
 					}
 				}
 			}
 		}
-
 		while (t_wait_timer.wait_for(std::chrono::seconds(2))) {
 		}
 	}
