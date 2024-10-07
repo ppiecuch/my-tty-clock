@@ -671,10 +671,17 @@ std::string key_event() {
 		case 'p':
 		case 'P':
 			r = "print";
+			break;
 
 		case 'n':
 		case 'N':
 			r = "next";
+			break;
+
+		case 'o':
+		case 'O':
+			r = "say";
+			break;
 
 		default:
 			pselect(1, &rfds, NULL, NULL, &length, NULL);
