@@ -941,7 +941,7 @@ void cron_run() {
 static std::vector<std::string> tts_events;
 
 bool is_mp3(const char *filename) {
-	FILEW *file(filename, "rb");
+	FILEW file(filename, "rb");
 	if (!file)
 		return false;
 	unsigned char buffer[3];
