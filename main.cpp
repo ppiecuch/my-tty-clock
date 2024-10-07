@@ -53,6 +53,9 @@ struct FILEW {
 		f = nullptr;
 		return e;
 	}
+	int flush() {
+		return ::fflush(f);
+	}
 	const char *fgets(char *buf, size_t size) {
 		const char *ret = ::fgets(buf, size, f);
 		buf[size - 1] = 0;
@@ -72,19 +75,30 @@ struct FILEW {
 	}
 };
 
+const char *fgets(char *buf, size_t size, FILEW &f) { return f.fgets(buf, size); }
+size_t fread(char *buf, size_t size, size_t n, FILEW &f) { return f.fread(buf, size, n); }
+int fflush(FILEW &f) { return f.flush(); }
+
 static bool verbose = false;
 static FILEW flog("echo.log", "w");
 
 #define LOG(fmt, ...)                                      \
 	if (verbose) {                                         \
 		fprintf(flog, "[words-memo] " fmt, ##__VA_ARGS__); \
+		fflush(flog);                                      \
 	}
 
-#define INFO(fmt, ...) \
-	fprintf(flog, "[words-memo] " fmt, ##__VA_ARGS__)
+#define INFO(fmt, ...)                                     \
+	{                                                      \
+		fprintf(flog, "[words-memo] " fmt, ##__VA_ARGS__); \
+		fflush(flog);                                      \
+	}
 
-#define ERROR(fmt, ...) \
-	fprintf(flog, "[words-memo] " fmt, ##__VA_ARGS__)
+#define ERROR(fmt, ...)                                    \
+	{                                                      \
+		fprintf(flog, "[words-memo] " fmt, ##__VA_ARGS__); \
+		fflush(flog);                                      \
+	}
 
 #define f_ssprintf(...) \
 	({ int _ss_size = snprintf(0, 0, ##__VA_ARGS__);    \
@@ -151,9 +165,6 @@ static int create_directory(const std::string &path) {
 		return 1;
 	}
 }
-
-const char *fgets(char *buf, size_t size, FILEW &f) { return f.fgets(buf, size); }
-size_t fread(char *buf, size_t size, size_t n, FILEW &f) { return f.fread(buf, size, n); }
 
 std::wstring simplifieDiacritics(const std::wstring &str) {
 	static std::map<std::wstring, std::wstring> defaultDiacriticsRemovalMap = {
