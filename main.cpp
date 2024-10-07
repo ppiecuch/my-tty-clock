@@ -258,7 +258,7 @@ void init(void) {
 	if (ttyclock.tty) {
 		FILE *ftty = fopen(ttyclock.tty, "r+");
 		if (!ftty) {
-			fprintf(stderr, "words-memo: error: '%s' couldn't be opened: %s.\n", ttyclock.tty, strerror(errno));
+			printf("words-memo: error: '%s' couldn't be opened: %s.\n", ttyclock.tty, strerror(errno));
 			exit(EXIT_FAILURE);
 		}
 		ttyclock.ttyscr = newterm(NULL, ftty, ftty);
@@ -773,18 +773,18 @@ int run_cmd(char *const *args) {
 			} else {
 				if (WIFSIGNALED(status)) {
 					if (WCOREDUMP(status)) {
-						fprintf(stderr, "[words-memo] the child process produced a core dump\n");
+						printf("[words-memo] the child process produced a core dump\n");
 					}
 					if (WTERMSIG(status)) {
-						fprintf(stderr, "[words-memo] the child process was terminated\n");
+						printf("[words-memo] the child process was terminated\n");
 					}
 				}
 			}
 		} else {
-			fprintf(stderr, "[words-memo] waitpid error\n");
+			printf("[words-memo] waitpid error\n");
 		}
 	} else {
-		fprintf(stderr, "[words-memo] posix_spawn status: %s\n", strerror(status));
+		printf("[words-memo] posix_spawn status: %s\n", strerror(status));
 	}
 	return -1;
 }
@@ -974,22 +974,14 @@ void tts_run() {
 				} else {
 					std::string url = _tts + escape(memo) + _lang_opt + "es" + _client;
 					std::vector<const char *> hdrs{ _ref.c_str(), _agent.c_str(), 0 };
-					if (par_easycurl_to_file_ex(url.c_str(), mp3.c_str(), hdrs.data())) {
-						SI_Error rc = ini.LoadFile(LOCALCACHE);
-						if (rc < 0) {
-							fprintf(stderr, "%s: unable to load words data (error 0x%X)\n", argv[0], rc);
-							return 1;
-						};
-					} else {
-						if (!file_exists(LOCALCACHE)) {
-							fprintf(stderr, "%s: words file not found\n", argv[0]);
-						}
-						SI_Error rc = ini.LoadFile(LOCALCACHE);
-						if (rc < 0) {
-							fprintf(stderr, "%s: unable to load words data (error 0x%X)\n", argv[0], rc);
-							return 1;
-						};
+					if (!par_easycurl_to_file_ex(url.c_str(), mp3.c_str(), hdrs.data())) {
+						printf("[words-memo]: download failed\n");
 					}
+					if (!file_exists(mp3)) {
+						printf("[words-memo]: words file not found\n");
+					} else {
+						// play mp3
+					};
 				}
 			}
 		}
@@ -1164,10 +1156,10 @@ int main(int argc, char **argv) {
 			case 'T': {
 				struct stat sbuf;
 				if (stat(optarg, &sbuf) == -1) {
-					fprintf(stderr, "words-memo: error: couldn't stat '%s': %s.\n", optarg, strerror(errno));
+					printf("words-memo: error: couldn't stat '%s': %s.\n", optarg, strerror(errno));
 					exit(EXIT_FAILURE);
 				} else if (!S_ISCHR(sbuf.st_mode)) {
-					fprintf(stderr, "words-memo: error: '%s' doesn't appear to be a character device.\n", optarg);
+					printf("words-memo: error: '%s' doesn't appear to be a character device.\n", optarg);
 					exit(EXIT_FAILURE);
 				} else {
 					free(ttyclock.tty);
@@ -1227,23 +1219,24 @@ int main(int argc, char **argv) {
 			if (par_easycurl_to_file(WORDSURL, LOCALCACHE)) {
 				SI_Error rc = ini.LoadFile(LOCALCACHE);
 				if (rc < 0) {
-					fprintf(stderr, "%s: unable to load words data (error 0x%X)\n", argv[0], rc);
+					printf("%s: unable to load words data (error 0x%X)\n", argv[0], rc);
 					return 1;
 				};
 			} else {
 				if (!file_exists(LOCALCACHE)) {
-					fprintf(stderr, "%s: words file not found\n", argv[0]);
+					printf("%s: words file not found\n", argv[0]);
+				} else {
+					SI_Error rc = ini.LoadFile(LOCALCACHE);
+					if (rc < 0) {
+						printf("%s: unable to load words data (error 0x%X)\n", argv[0], rc);
+						return 1;
+					};
 				}
-				SI_Error rc = ini.LoadFile(LOCALCACHE);
-				if (rc < 0) {
-					fprintf(stderr, "%s: unable to load words data (error 0x%X)\n", argv[0], rc);
-					return 1;
-				};
 			}
 		} else {
 			SI_Error rc = ini.LoadFile(LOCALCACHE);
 			if (rc < 0) {
-				fprintf(stderr, "%s: unable to load words data (error 0x%X)\n", argv[0], rc);
+				printf("%s: unable to load words data (error 0x%X)\n", argv[0], rc);
 				return 1;
 			};
 		}
@@ -1307,7 +1300,7 @@ int main(int argc, char **argv) {
 				SI_Error rc = ini.LoadFile(LOCALCACHE);
 				if (rc < 0) {
 					endwin();
-					fprintf(stderr, "%s: unable to load words data (error 0x%X)\n", argv[0], rc);
+					printf("%s: unable to load words data (error 0x%X)\n", argv[0], rc);
 					return 100;
 				}
 			}
