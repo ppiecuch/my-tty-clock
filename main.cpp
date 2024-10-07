@@ -1310,7 +1310,7 @@ int main(int argc, char **argv) {
 				SI_Error rc = ini.LoadFile(LOCALCACHE);
 				if (rc < 0) {
 					endwin();
-					printf("%s: unable to load words data (error 0x%X)\n", argv[0], rc);
+					ERROR("Unable to load words data (error 0x%X)\n", rc);
 					return 100;
 				}
 			}
