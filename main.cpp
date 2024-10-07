@@ -11,6 +11,7 @@
 #include <sys/prctl.h>
 #endif
 #include <mad.h>
+#include <spawn.h>
 #include <sys/file.h>
 #include <sys/resource.h>
 #include <sys/soundcard.h>
@@ -28,6 +29,7 @@
 #include <numeric>
 #include <sstream>
 #include <string>
+#include <thread>
 #include <vector>
 
 #define WORDSURL "https://raw.githubusercontent.com/ppiecuch/shared-assets/master/words.txt"
@@ -691,6 +693,14 @@ std::string key_event() {
 }
 
 static int file_exists(const char *file) { return (access(file, F_OK) == 0); }
+static size_t file_size(const char *file) {
+	struct stat st;
+	if (stat(file, &st) != 0)
+		return -1;
+	if (!S_ISREG(st.st_mode))
+		return 0;
+	return st.st_size;
+}
 
 static std::string trimL(std::string s) {
 	unsigned int i = 0;
@@ -709,6 +719,34 @@ static std::string trimR(std::string s) {
 }
 
 static std::string trim(std::string s) { return trimL(trimR(s)); }
+
+extern "C" char **environ;
+
+int run_cmd(char *const *args) {
+	pid_t pid;
+	int status = posix_spawn(&pid, args[0], nullptr, nullptr, args, environ);
+	if (status == 0) {
+		if (waitpid(pid, &status, 0) != -1) {
+			if (WIFEXITED(status)) {
+				return WEXITSTATUS(status);
+			} else {
+				if (WIFSIGNALED(status)) {
+					if (WCOREDUMP(status)) {
+						fprintf(stderr, "[words-memo] the child process produced a core dump\n");
+					}
+					if (WTERMSIG(status)) {
+						fprintf(stderr, "[words-memo] the child process was terminated\n");
+					}
+				}
+			}
+		} else {
+			fprintf(stderr, "[words-memo] waitpid error\n");
+		}
+	} else {
+		fprintf(stderr, "[words-memo] posix_spawn status: %s\n", strerror(status));
+	}
+	return -1;
+}
 
 bool exec_cmd(const char *cmd, char *result, int result_size) {
 	FILE *fp = popen(cmd, "r");
@@ -811,6 +849,68 @@ static void print_memo(const std::string &line1, const std::string &line2, int d
 
 	write_file(prnt, "\n\n\n\n\n\n\n\n\n\n", 10);
 }
+
+/// BACKGROUND THREADS
+
+struct TimedWaiter {
+	void interrupt() {
+		auto l = lock();
+		interrupted = true;
+		cv.notify_all();
+	}
+	// returns false if interrupted
+	template <class Rep, class Period>
+	bool wait_for(std::chrono::duration<Rep, Period> duration) const {
+		auto l = lock();
+		return !cv.wait_until(l, std::chrono::steady_clock::now() + duration, [&] { return interrupted; });
+	}
+
+private:
+	std::unique_lock<std::mutex> lock() const { return std::unique_lock<std::mutex>(m); }
+
+	mutable std::mutex m;
+	mutable std::condition_variable cv;
+	bool interrupted = false;
+} c_wait_timer, t_wait_timer;
+
+struct task_t {
+	time_t rawtime;
+	std::string task;
+};
+
+static std::vector<task_t> cron_events;
+
+void cron_run() {
+	std::vector<std::string> crontab = {
+		"* */15 9-17 * * mon,tue,thu,fri daily",
+		"* */20 10-18 * * sat weekend1",
+		"* */30 12-18 * * sun weekend2",
+	};
+
+	printf("Internal cron started with %ld entries.\n", crontab.size());
+
+	while (running) {
+		while (c_wait_timer.wait_for(std::chrono::seconds(5))) {
+		}
+	}
+
+	printf("Internal cron ended - pending %ld tasks.\n", cron_events.size());
+}
+
+static std::vector<std::string> tts_events;
+
+void tts_run() {
+	printf("TTS module started with %ld entries.\n", crontab.size());
+
+	while (running) {
+		while (t_wait_timer.wait_for(std::chrono::seconds(5))) {
+		}
+	}
+
+	printf("TTS module ended - pending %ld tasks.\n", tts_events.size());
+}
+
+/// MAIN LOOP
 
 int main(int argc, char **argv) {
 	int c;
@@ -1059,6 +1159,9 @@ int main(int argc, char **argv) {
 		return 0;
 	}
 
+	std::thread cron_thrd(cron_run);
+	std::thread tts_thrd(tts_run);
+
 	atexit(cleanup);
 
 	init();
@@ -1163,6 +1266,10 @@ int main(int argc, char **argv) {
 	}
 
 	endwin();
+
+	// clean up
+	c_wait_timer.interrupt(), t_wait_timer.interrupt();
+	cron_thrd.join(), tts_thrd.join();
 
 	return 0;
 }
