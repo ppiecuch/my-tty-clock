@@ -892,7 +892,7 @@ void cron_run() {
 
 	printf("Internal cron started with %ld entries.\n", crontab.size());
 
-	while (running) {
+	while (ttyclock.running) {
 		while (c_wait_timer.wait_for(std::chrono::seconds(5))) {
 		}
 	}
@@ -905,7 +905,7 @@ static std::vector<std::string> tts_events;
 void tts_run() {
 	printf("TTS module started.\n");
 
-	while (running) {
+	while (ttyclock.running) {
 		while (t_wait_timer.wait_for(std::chrono::seconds(5))) {
 		}
 	}
