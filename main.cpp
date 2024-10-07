@@ -957,8 +957,6 @@ void cron_run() {
 		"* */30 12-18 * * sun weekend2",
 	};
 
-	FILE *echo = is_safe_output ? nullptr : freopen("echo.log", "a", stderr); // send output to log file
-
 	INFO("Internal cron started with %ld entries.\n", crontab.size());
 
 	while (ttyclock.running) {
@@ -990,8 +988,6 @@ std::string escape(std::string text) {
 }
 
 void tts_run() {
-	FILE *echo = is_safe_output ? nullptr : freopen("echo.log", "a", stderr); // send output to log file
-
 	INFO("TTS module started.\n");
 
 	mad_player_t player;
