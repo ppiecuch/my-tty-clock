@@ -985,19 +985,12 @@ void tts_run() {
 				}
 			}
 		}
+
+		while (t_wait_timer.wait_for(std::chrono::seconds(2))) {
+		}
 	}
 
-	void GoogleTTS::parse() {
-		replace(_text);
-		std::string cmd = _curl + "'" + _tts + _text + _lang + _client + "' -H" + _ref + "-H" + _agent + _out + " 2>/dev/null";
-	}
-}
-}
-while (t_wait_timer.wait_for(std::chrono::seconds(2))) {
-}
-}
-
-printf("TTS module ended - pending %ld tasks.\n", tts_events.size());
+	printf("TTS module ended - pending %ld tasks.\n", tts_events.size());
 }
 
 /// MAIN LOOP
