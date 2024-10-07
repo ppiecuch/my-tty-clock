@@ -733,10 +733,10 @@ std::string key_event() {
 	return r;
 }
 
-static int file_exists(const char *file) { return (access(file, F_OK) == 0); }
-static size_t file_size(const char *file) {
+static int file_exists(const std::string &file) { return (access(file.c_str(), F_OK) == 0); }
+static size_t file_size(const std::string &file) {
 	struct stat st;
-	if (stat(file, &st) != 0)
+	if (stat(file.c_str(), &st) != 0)
 		return -1;
 	if (!S_ISREG(st.st_mode))
 		return 0;
