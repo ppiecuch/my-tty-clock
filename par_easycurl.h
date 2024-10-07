@@ -229,10 +229,12 @@ int par_easycurl_to_file_ex(char const* srcurl, char const* dstpath, const char 
     struct curl_slist *hdrs_list = NULL;
     if (hdrs) {
         while (*hdrs) {
-            header_list = curl_slist_append(header_list, *hdrs++);
+            hdrs_list = curl_slist_append(hdrs_list, *hdrs++);
         }
     }
     curl_easy_setopt(handle, CURLOPT_HTTPHEADER, hdrs_list);
+    if (hdrs_list)
+        curl_slist_free_all(hdrs_list);
     curl_easy_setopt(handle, CURLOPT_TIMEOUT, 60);
     curl_easy_perform(handle);
     curl_easy_getinfo(handle, CURLINFO_CONDITION_UNMET, &code);
