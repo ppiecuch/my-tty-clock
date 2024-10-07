@@ -906,7 +906,16 @@ void tts_run() {
 	printf("TTS module started.\n");
 
 	while (ttyclock.running) {
-		while (t_wait_timer.wait_for(std::chrono::seconds(5))) {
+		if (!tts_events.empty) {
+			std::string memo = tts_events.pop_back();
+			std::wstring res;
+			if (ConvertUTF8toWide(memo.c_str(), res)) {
+				std::string asc = trunc_wstring(simplifieDiacritics(res));
+				printf("Processing memo %s in tts.\n", asc.c_str());
+				touch("tts-cache/" + asc + ".mp3");
+			}
+		}
+		while (t_wait_timer.wait_for(std::chrono::seconds(2))) {
 		}
 	}
 
@@ -915,11 +924,33 @@ void tts_run() {
 
 /// MAIN LOOP
 
+static bool tty_is_devpts(const char *tty) {
+	bool retval = false;
+	struct statfs sfs;
+
+#ifndef DEVPTS_SUPER_MAGIC
+#define DEVPTS_SUPER_MAGIC 0x1cd1
+#endif
+
+	if (statfs(tty, &sfs) == 0) {
+		if (sfs.f_type == DEVPTS_SUPER_MAGIC)
+			retval = true;
+	}
+	return retval;
+}
+static int is_console(int fd) {
+	struct vt_mode vt;
+	int ret = ioctl(fd, VT_GETMODE, &vt);
+	return !ret;
+}
+
 int main(int argc, char **argv) {
 	int c;
 	int refreshrate = 30; /* sec */
 	bool dump_flag = false, print_flag = false;
 	int print_index = -1;
+
+	bool is_con = is_console(STDIN_FILENO), is_safe_output = isatty(STDOUT_FILENO) && tty_is_devpts(ttyname(STDOUT_FILENO));
 
 #ifdef DEBUG
 #ifndef __APPLE__
@@ -931,6 +962,10 @@ int main(int argc, char **argv) {
 #endif
 
 	create_directory("tts-cache");
+
+	FILE *echo = nullptr;
+	if (!is_safe_output)
+		echo = freopen("echo.log", "w", stdout); // send output to log file
 
 	/* Alloc ttyclock */
 	memset(&ttyclock, 0, sizeof(ttyclock_t));
@@ -1216,11 +1251,7 @@ int main(int argc, char **argv) {
 					line1 = trim(s.substr(0, s.find(delimiter)));
 					line2 = trim(s.substr(s.find(delimiter) + 2));
 
-					std::wstring res;
-					if (ConvertUTF8toWide(line1.c_str(), res)) {
-						std::string asc = trunc_wstring(simplifieDiacritics(res));
-						touch("tts-cache/" + asc + ".mp3");
-					}
+					tts_events.push_back(line1);
 				} else {
 					key += "!";
 				}
@@ -1271,6 +1302,12 @@ int main(int argc, char **argv) {
 	endwin();
 
 	// clean up
+
+	if (echo) {
+		freopen("CON", "w", stdout);
+		fclose(echo);
+	}
+
 	c_wait_timer.interrupt(), t_wait_timer.interrupt();
 	cron_thrd.join(), tts_thrd.join();
 
