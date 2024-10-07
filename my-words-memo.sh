@@ -58,6 +58,6 @@ if [ -f /tmp/words-memo.txt ]; then
   mv /tmp/words-memo.txt /tmp/words-memo.0.txt
 fi
 
-./my-words-memo -c
+./my-words-memo -F -c
 
 cleanup

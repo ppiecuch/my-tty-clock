@@ -1059,6 +1059,7 @@ int main(int argc, char **argv) {
 			case 'h':
 			default:
 				printf("usage : my-word-memo [-iuvsScbtrahDBxn] [-C [0-7]] [-f format] [-d delay] [-a nsdelay] [-T tty] \n"
+					   "    -F            Force stdout to file (default: echo.log)       \n"
 					   "    -s            Show seconds                                   \n"
 					   "    -S            Screensaver mode                               \n"
 					   "    -x            Show box                                       \n"
@@ -1069,6 +1070,7 @@ int main(int argc, char **argv) {
 					   "    -u            Use UTC time                                   \n"
 					   "    -T tty        Display the clock on the specified terminal    \n"
 					   "    -p            Print given memo (-1 for random)               \n"
+					   "    -P            TTS given memo (-1 for random)                 \n"
 					   "    -R            Words-memo display refresh rate                \n"
 					   "    -r            Do rebound the clock                           \n"
 					   "    -f format     Set the date format                            \n"
@@ -1164,6 +1166,9 @@ int main(int argc, char **argv) {
 			} break;
 			case 'n':
 				ttyclock.option.noquit = true;
+				break;
+			case 'F':
+				is_safe_output = false;
 				break;
 			case 'v':
 				verbose = true;
