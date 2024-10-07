@@ -45,9 +45,16 @@
 
 static bool verbose = false;
 
-#define LOG(fmt, ...) \
-	if (verbose)      \
-	printf("[words-memo] " fmt, __VA_ARGS__)
+#define LOG(fmt, ...)                                     \
+	if (verbose) {                                        \
+		fprintf(stderr, "[words-memo] " fmt, __VA_ARGS__) \
+	}
+
+#define INFO(fmt, ...) \
+	fprintf(stderr, "[words-memo] " fmt, __VA_ARGS__)
+
+#define ERROR(fmt, ...) \
+	fprintf(stderr, "[words-memo] " fmt, __VA_ARGS__)
 
 #define f_ssprintf(...) \
 	({ int _ss_size = snprintf(0, 0, ##__VA_ARGS__);    \
@@ -258,7 +265,7 @@ void init(void) {
 	if (ttyclock.tty) {
 		FILE *ftty = fopen(ttyclock.tty, "r+");
 		if (!ftty) {
-			printf("words-memo: error: '%s' couldn't be opened: %s.\n", ttyclock.tty, strerror(errno));
+			ERROR("Error: '%s' couldn't be opened: %s.\n", ttyclock.tty, strerror(errno));
 			exit(EXIT_FAILURE);
 		}
 		ttyclock.ttyscr = newterm(NULL, ftty, ftty);
@@ -359,7 +366,7 @@ void signal_handler(int signal) {
 			/* Segmentation fault signal */
 		case SIGSEGV:
 			endwin();
-			fprintf(stderr, "Segmentation fault.\n");
+			ERROR("Segmentation fault.\n");
 			exit(EXIT_FAILURE);
 			break;
 	}
@@ -773,18 +780,18 @@ int run_cmd(char *const *args) {
 			} else {
 				if (WIFSIGNALED(status)) {
 					if (WCOREDUMP(status)) {
-						printf("[words-memo] the child process produced a core dump\n");
+						LOG("The child process produced a core dump\n");
 					}
 					if (WTERMSIG(status)) {
-						printf("[words-memo] the child process was terminated\n");
+						LOG("The child process was terminated\n");
 					}
 				}
 			}
 		} else {
-			printf("[words-memo] waitpid error\n");
+			LOG("waitpid error\n");
 		}
 	} else {
-		printf("[words-memo] posix_spawn status: %s\n", strerror(status));
+		LOG("posix_spawn status: %s\n", strerror(status));
 	}
 	return -1;
 }
@@ -950,9 +957,9 @@ void cron_run() {
 		"* */30 12-18 * * sun weekend2",
 	};
 
-	FILE *echo = is_safe_output ? nullptr : freopen("echo.log", "w", stdout); // send output to log file
+	FILE *echo = is_safe_output ? nullptr : freopen("echo.log", "a", stderr); // send output to log file
 
-	printf("Internal cron started with %ld entries.\n", crontab.size());
+	INFO("Internal cron started with %ld entries.\n", crontab.size());
 
 	while (ttyclock.running) {
 		while (c_wait_timer.wait_for(std::chrono::seconds(5))) {
@@ -983,9 +990,9 @@ std::string escape(std::string text) {
 }
 
 void tts_run() {
-	FILE *echo = is_safe_output ? nullptr : freopen("echo.log", "w", stdout); // send output to log file
+	FILE *echo = is_safe_output ? nullptr : freopen("echo.log", "a", stderr); // send output to log file
 
-	printf("TTS module started.\n");
+	INFO("TTS module started.\n");
 
 	mad_player_t player;
 
@@ -995,7 +1002,7 @@ void tts_run() {
 			std::wstring res;
 			if (ConvertUTF8toWide(memo.c_str(), res)) {
 				std::string asc = trunc_wstring(simplifieDiacritics(res));
-				printf("Processing memo %s in tts.\n", asc.c_str());
+				LOG("Processing memo %s in tts.\n", asc.c_str());
 				std::string mp3 = "tts-cache/" + asc + ".mp3";
 				if (file_exists(mp3) && !is_mp3(mp3)) {
 					touch(mp3.c_str());
@@ -1003,11 +1010,11 @@ void tts_run() {
 					std::string url = _tts + escape(memo) + _lang_opt + "es" + _client;
 					std::vector<const char *> hdrs{ _ref.c_str(), _agent.c_str(), 0 };
 					if (!par_easycurl_to_file_ex(url.c_str(), mp3.c_str(), hdrs.data())) {
-						printf("[words-memo]: download failed\n");
-						printf("[words-memo]: url: %s\n", url.c_str());
+						LOG("download failed\n");
+						LOG("url: %s\n", url.c_str());
 					}
 					if (!file_exists(mp3)) {
-						printf("[words-memo]: words file not found\n");
+						LOG("sound file not found\n");
 					} else {
 						player.play(mp3.c_str()); // play mp3
 					}
@@ -1018,7 +1025,7 @@ void tts_run() {
 		}
 	}
 
-	printf("TTS module ended - pending %ld tasks.\n", tts_events.size());
+	INFO("TTS module ended - pending %ld tasks.\n", tts_events.size());
 }
 
 /// MAIN LOOP
@@ -1154,10 +1161,10 @@ int main(int argc, char **argv) {
 			case 'T': {
 				struct stat sbuf;
 				if (stat(optarg, &sbuf) == -1) {
-					printf("words-memo: error: couldn't stat '%s': %s.\n", optarg, strerror(errno));
+					ERROR("Error: couldn't stat '%s': %s.\n", optarg, strerror(errno));
 					exit(EXIT_FAILURE);
 				} else if (!S_ISCHR(sbuf.st_mode)) {
-					printf("words-memo: error: '%s' doesn't appear to be a character device.\n", optarg);
+					ERROR("Error: '%s' doesn't appear to be a character device.\n", optarg);
 					exit(EXIT_FAILURE);
 				} else {
 					free(ttyclock.tty);
@@ -1220,16 +1227,16 @@ int main(int argc, char **argv) {
 			if (par_easycurl_to_file(WORDSURL, LOCALCACHE)) {
 				SI_Error rc = ini.LoadFile(LOCALCACHE);
 				if (rc < 0) {
-					printf("%s: unable to load words data (error 0x%X)\n", argv[0], rc);
+					ERROR("%s: unable to load words data (error 0x%X)\n", argv[0], rc);
 					return 1;
 				};
 			} else {
 				if (!file_exists(LOCALCACHE)) {
-					printf("%s: words file not found\n", argv[0]);
+					ERROR("Words file not found\n");
 				} else {
 					SI_Error rc = ini.LoadFile(LOCALCACHE);
 					if (rc < 0) {
-						printf("%s: unable to load words data (error 0x%X)\n", argv[0], rc);
+						ERROR("Unable to load words data (error 0x%X)\n", rc);
 						return 1;
 					};
 				}
@@ -1237,7 +1244,7 @@ int main(int argc, char **argv) {
 		} else {
 			SI_Error rc = ini.LoadFile(LOCALCACHE);
 			if (rc < 0) {
-				printf("%s: unable to load words data (error 0x%X)\n", argv[0], rc);
+				ERROR("Unable to load words data (error 0x%X)\n", rc);
 				return 1;
 			};
 		}
@@ -1276,9 +1283,7 @@ int main(int argc, char **argv) {
 		return 0;
 	}
 
-	FILE *echo = nullptr;
-	if (!is_safe_output)
-		echo = freopen("echo.log", "w", stdout); // send output to log file
+	FILE *echo = is_safe_output ? nullptr : freopen("echo.log", "w", stderr); // send output to log file
 
 	std::thread cron_thrd(cron_run);
 	std::thread tts_thrd(tts_run);
@@ -1387,7 +1392,7 @@ int main(int argc, char **argv) {
 	// clean up
 
 	if (echo) {
-		freopen("CON", "w", stdout);
+		freopen("CON", "w", stderr);
 		fclose(echo);
 	}
 
