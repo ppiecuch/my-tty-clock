@@ -115,6 +115,33 @@ static int create_directory(const std::string &path) {
 	}
 }
 
+struct FILEW {
+	FILE *f = nullptr;
+
+	bool open(const char *path, const char *mode) { return nullptr != (f = ::fopen(path, mode)); }
+	bool opened() const { return f != nullptr; }
+	const char *fgets(char *buf, size_t size) {
+		const char *ret = ::fgets(buf, size, f);
+		buf[size - 1] = 0;
+		return ret;
+	}
+	size_t fread(char *buf, size_t size, size_t n) {
+		return ::fread(buf, size, n, f);
+	}
+
+	operator bool() { return f != nullptr; }
+	operator FILE *() { return f; }
+
+	FILEW(const char *path, const char *mode) { open(path, mode); }
+	~FILEW() {
+		if (f)
+			fclose(f);
+	}
+};
+
+const char *fgets(char *buf, size_t size, FILEW &f) { return f.fgets(buf, size); }
+size_t fread(char *buf, size_t size, size_t n, FILEW &f) { return f.fread(buf, size, n); }
+
 std::wstring simplifieDiacritics(const std::wstring &str) {
 	static std::map<std::wstring, std::wstring> defaultDiacriticsRemovalMap = {
 		{ L"A", L"\u0041\u24B6\uFF21\u00C0\u00C1\u00C2\u1EA6\u1EA4\u1EAA\u1EA8\u00C3\u0100\u0102\u1EB0\u1EAE\u1EB4\u1EB2\u0226\u01E0\u00C4\u01DE\u1EA2\u00C5\u01FA\u01CD\u0200\u0202\u1EA0\u1EAC\u1EB6\u1E00\u0104\u023A\u2C6F" },
@@ -913,6 +940,15 @@ void cron_run() {
 
 static std::vector<std::string> tts_events;
 
+bool is_mp3(const char *filename) {
+	FILEW *file(filename, "rb");
+	if (!file)
+		return false;
+	unsigned char buffer[3];
+	fread(buffer, 1, 3, file);
+	return (buffer[0] == 'I' && buffer[1] == 'D' && buffer[2] == '3') || (buffer[0] == 0xFF && (buffer[1] & 0xE0) == 0xE0);
+}
+
 void tts_run() {
 	printf("TTS module started.\n");
 
@@ -923,14 +959,48 @@ void tts_run() {
 			if (ConvertUTF8toWide(memo.c_str(), res)) {
 				std::string asc = trunc_wstring(simplifieDiacritics(res));
 				printf("Processing memo %s in tts.\n", asc.c_str());
-				touch("tts-cache/" + asc + ".mp3");
+				std::string mp3 = "tts-cache/" + asc + ".mp3";
+				if (file_exists(mp3) && !is_mp3(mp3)) {
+					touch(mp3.c_str());
+				} else {
+					size_t start_pos = 0;
+					while ((start_pos = memo.find(" ", start_pos)) != std::string::npos) {
+						memo.replace(start_pos, 1, "%20");
+						start_pos += 3; // Handles case where 'to' is a substring of 'from'
+					}
+					std::string url = _tts + _text + _lang + _client;
+					std::vector<const char *> hdrs{ _ref, _agent, 0 };
+					if (par_easycurl_to_file_ex(url.c_str(), mp3.c_str(), hdrs.const_data())) {
+						SI_Error rc = ini.LoadFile(LOCALCACHE);
+						if (rc < 0) {
+							fprintf(stderr, "%s: unable to load words data (error 0x%X)\n", argv[0], rc);
+							return 1;
+						};
+					} else {
+						if (!file_exists(LOCALCACHE)) {
+							fprintf(stderr, "%s: words file not found\n", argv[0]);
+						}
+						SI_Error rc = ini.LoadFile(LOCALCACHE);
+						if (rc < 0) {
+							fprintf(stderr, "%s: unable to load words data (error 0x%X)\n", argv[0], rc);
+							return 1;
+						};
+					}
+				}
 			}
 		}
-		while (t_wait_timer.wait_for(std::chrono::seconds(2))) {
+
+		void GoogleTTS::parse() {
+			replace(_text);
+			std::string cmd = _curl + "'" + _tts + _text + _lang + _client + "' -H" + _ref + "-H" + _agent + _out + " 2>/dev/null";
 		}
 	}
+}
+while (t_wait_timer.wait_for(std::chrono::seconds(2))) {
+}
+}
 
-	printf("TTS module ended - pending %ld tasks.\n", tts_events.size());
+printf("TTS module ended - pending %ld tasks.\n", tts_events.size());
 }
 
 /// MAIN LOOP

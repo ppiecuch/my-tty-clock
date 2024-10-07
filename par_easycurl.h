@@ -7,6 +7,8 @@
 // BEGIN PUBLIC API
 // -----------------------------------------------------------------------------
 
+// clang-format off
+
 #ifndef PAR_EASYCURL_H
 #define PAR_EASYCURL_H
 
@@ -204,8 +206,50 @@ int par_easycurl_to_file(char const* srcurl, char const* dstpath)
     return 1;
 }
 
+int par_easycurl_to_file_ex(char const* srcurl, char const* dstpath, const char **hdrs)
+{
+    long code = 0;
+    long status = 0;
+    FILE* filehandle = fopen(dstpath, "wb");
+    if (!filehandle) {
+        printf("Unable to open %s for writing.\n", dstpath);
+        return 0;
+    }
+    CURL* handle = curl_easy_init();
+    curl_easy_setopt(handle, CURLOPT_NOSIGNAL, 1);
+    curl_easy_setopt(handle, CURLOPT_ENCODING, "gzip, deflate");
+    curl_easy_setopt(handle, CURLOPT_FOLLOWLOCATION, 1);
+    curl_easy_setopt(handle, CURLOPT_MAXREDIRS, 8);
+    curl_easy_setopt(handle, CURLOPT_FAILONERROR, 1);
+    curl_easy_setopt(handle, CURLOPT_WRITEDATA, filehandle);
+    curl_easy_setopt(handle, CURLOPT_HEADERFUNCTION, onheader);
+    curl_easy_setopt(handle, CURLOPT_URL, srcurl);
+    curl_easy_setopt(handle, CURLOPT_TIMECONDITION, CURL_TIMECOND_IFMODSINCE);
+    curl_easy_setopt(handle, CURLOPT_TIMEVALUE, 0);
+    struct curl_slist *hdrs_list = NULL;
+    if (hdrs) {
+        while (*hdrs) {
+            header_list = curl_slist_append(header_list, *hdrs++);
+        }
+    }
+    curl_easy_setopt(handle, CURLOPT_HTTPHEADER, hdrs_list);
+    curl_easy_setopt(handle, CURLOPT_TIMEOUT, 60);
+    curl_easy_perform(handle);
+    curl_easy_getinfo(handle, CURLINFO_CONDITION_UNMET, &code);
+    curl_easy_getinfo(handle, CURLINFO_RESPONSE_CODE, &status);
+    fclose(filehandle);
+    if (status == 304 || status >= 400) {
+        remove(dstpath);
+        return 0;
+    }
+    curl_easy_cleanup(handle);
+    return 1;
+}
+
 #endif // PAR_EASYCURL_IMPLEMENTATION
 #endif // PAR_EASYCURL_H
+
+// clang-format on
 
 // par_easycurl is distributed under the MIT license:
 //
