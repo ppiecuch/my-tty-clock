@@ -16,6 +16,7 @@
 #include <sys/file.h>
 #include <sys/resource.h>
 #include <sys/soundcard.h>
+#include <sys/statfs.h>
 
 #include <sys/stat.h>
 #include <sys/wait.h>
