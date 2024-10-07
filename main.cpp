@@ -1054,7 +1054,7 @@ int main(int argc, char **argv) {
 	ttyclock.option.nsdelay = 0; /* -0FPS */
 	ttyclock.option.blink = false;
 
-	while ((c = getopt(argc, argv, "ikuvsScbtp:rR:hBwxnDC:f:d:T:a:V")) != -1) {
+	while ((c = getopt(argc, argv, "FikuvsScbtp:P:rR:hBwxnDC:f:d:T:a:V")) != -1) {
 		switch (c) {
 			case 'h':
 			default:
