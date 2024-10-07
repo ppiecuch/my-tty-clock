@@ -981,16 +981,17 @@ void tts_run() {
 						printf("[words-memo]: words file not found\n");
 					} else {
 						// play mp3
-					};
+					}
 				}
 			}
 		}
-
-		void GoogleTTS::parse() {
-			replace(_text);
-			std::string cmd = _curl + "'" + _tts + _text + _lang + _client + "' -H" + _ref + "-H" + _agent + _out + " 2>/dev/null";
-		}
 	}
+
+	void GoogleTTS::parse() {
+		replace(_text);
+		std::string cmd = _curl + "'" + _tts + _text + _lang + _client + "' -H" + _ref + "-H" + _agent + _out + " 2>/dev/null";
+	}
+}
 }
 while (t_wait_timer.wait_for(std::chrono::seconds(2))) {
 }
