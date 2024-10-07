@@ -25,7 +25,9 @@
 #include "par_easycurl.h"
 #include "simpleini/SimpleIni.h"
 
+#include <condition_variable>
 #include <map>
+#include <mutex>
 #include <numeric>
 #include <sstream>
 #include <string>
@@ -900,7 +902,7 @@ void cron_run() {
 static std::vector<std::string> tts_events;
 
 void tts_run() {
-	printf("TTS module started with %ld entries.\n", crontab.size());
+	printf("TTS module started.\n");
 
 	while (running) {
 		while (t_wait_timer.wait_for(std::chrono::seconds(5))) {
