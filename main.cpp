@@ -43,18 +43,48 @@
 #define LOCALCACHE "/tmp/words-memo.txt"
 #define APPVERSION "0.7"
 
-static bool verbose = false;
+struct FILEW {
+	FILE *f = nullptr;
 
-#define LOG(fmt, ...)                                        \
-	if (verbose) {                                           \
-		fprintf(stderr, "[words-memo] " fmt, ##__VA_ARGS__); \
+	bool open(const char *path, const char *mode) { return nullptr != (f = ::fopen(path, mode)); }
+	bool opened() const { return f != nullptr; }
+	int close() {
+		int e = ::fclose(f);
+		f = nullptr;
+		return e;
+	}
+	const char *fgets(char *buf, size_t size) {
+		const char *ret = ::fgets(buf, size, f);
+		buf[size - 1] = 0;
+		return ret;
+	}
+	size_t fread(char *buf, size_t size, size_t n) {
+		return ::fread(buf, size, n, f);
+	}
+
+	operator bool() { return f != nullptr; }
+	operator FILE *() { return f; }
+
+	FILEW(const char *path, const char *mode) { open(path, mode); }
+	~FILEW() {
+		if (f)
+			fclose(f);
+	}
+};
+
+static bool verbose = false;
+static FILEW flog("echo.log", "w");
+
+#define LOG(fmt, ...)                                      \
+	if (verbose) {                                         \
+		fprintf(flog, "[words-memo] " fmt, ##__VA_ARGS__); \
 	}
 
 #define INFO(fmt, ...) \
-	fprintf(stderr, "[words-memo] " fmt, ##__VA_ARGS__)
+	fprintf(flog, "[words-memo] " fmt, ##__VA_ARGS__)
 
 #define ERROR(fmt, ...) \
-	fprintf(stderr, "[words-memo] " fmt, ##__VA_ARGS__)
+	fprintf(flog, "[words-memo] " fmt, ##__VA_ARGS__)
 
 #define f_ssprintf(...) \
 	({ int _ss_size = snprintf(0, 0, ##__VA_ARGS__);    \
@@ -121,30 +151,6 @@ static int create_directory(const std::string &path) {
 		return 1;
 	}
 }
-
-struct FILEW {
-	FILE *f = nullptr;
-
-	bool open(const char *path, const char *mode) { return nullptr != (f = ::fopen(path, mode)); }
-	bool opened() const { return f != nullptr; }
-	const char *fgets(char *buf, size_t size) {
-		const char *ret = ::fgets(buf, size, f);
-		buf[size - 1] = 0;
-		return ret;
-	}
-	size_t fread(char *buf, size_t size, size_t n) {
-		return ::fread(buf, size, n, f);
-	}
-
-	operator bool() { return f != nullptr; }
-	operator FILE *() { return f; }
-
-	FILEW(const char *path, const char *mode) { open(path, mode); }
-	~FILEW() {
-		if (f)
-			fclose(f);
-	}
-};
 
 const char *fgets(char *buf, size_t size, FILEW &f) { return f.fgets(buf, size); }
 size_t fread(char *buf, size_t size, size_t n, FILEW &f) { return f.fread(buf, size, n); }
@@ -1279,8 +1285,6 @@ int main(int argc, char **argv) {
 		return 0;
 	}
 
-	FILE *echo = is_safe_output ? nullptr : freopen("echo.log", "w", stderr); // send output to log file
-
 	std::thread cron_thrd(cron_run);
 	std::thread tts_thrd(tts_run);
 
@@ -1386,12 +1390,6 @@ int main(int argc, char **argv) {
 	endwin();
 
 	// clean up
-
-	if (echo) {
-		freopen("CON", "w", stderr);
-		fclose(echo);
-	}
-
 	c_wait_timer.interrupt(), t_wait_timer.interrupt();
 	cron_thrd.join(), tts_thrd.join();
 

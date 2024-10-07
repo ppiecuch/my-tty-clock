@@ -158,7 +158,7 @@ int par_easycurl_to_memory(char const* url, par_byte** data, int* nbytes)
     curl_easy_setopt(handle, CURLOPT_SSL_VERIFYHOST, 0);
     CURLcode res = curl_easy_perform(handle);
     if (res != CURLE_OK) {
-        printf("CURL Error: %s\n", errbuf);
+        fprintf(stderr, "CURL Error: %s\n", errbuf);
         return 0;
     }
     curl_easy_getinfo(handle, CURLINFO_CONDITION_UNMET, &code);
@@ -178,7 +178,7 @@ int par_easycurl_to_file(char const* srcurl, char const* dstpath)
     long status = 0;
     FILE* filehandle = fopen(dstpath, "wb");
     if (!filehandle) {
-        printf("Unable to open %s for writing.\n", dstpath);
+        fprintf(stderr, "Unable to open %s for writing.\n", dstpath);
         return 0;
     }
     CURL* handle = curl_easy_init();
@@ -212,7 +212,7 @@ int par_easycurl_to_file_ex(char const* srcurl, char const* dstpath, const char 
     long status = 0;
     FILE* filehandle = fopen(dstpath, "wb");
     if (!filehandle) {
-        printf("Unable to open %s for writing.\n", dstpath);
+        fprintf(stderr, "Unable to open %s for writing.\n", dstpath);
         return 0;
     }
     CURL* handle = curl_easy_init();
