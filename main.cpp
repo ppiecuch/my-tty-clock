@@ -984,7 +984,7 @@ std::string escape(std::string text) {
 void tts_run() {
 	INFO("TTS module started.\n");
 
-	mad_player_t player(flog);
+	mad_player_t player(&run_cmd, flog);
 	int pause = 2;
 
 	while (t_wait_timer.wait_for(std::chrono::seconds(pause))) {
