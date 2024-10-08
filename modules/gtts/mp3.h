@@ -26,7 +26,7 @@ struct mad_player_t {
 	}
 
 	void play(const char *filename) {
-		const char *args[] = { _cmd_player, 0 };
+		const char *const args[] = { _cmd_player, 0 };
 		spawn(args);
 	}
 };
