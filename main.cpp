@@ -986,8 +986,11 @@ void tts_run() {
 	INFO("TTS module started.\n");
 
 	mad_player_t player(flog);
+	int pause = 2;
 
-	while (ttyclock.running) {
+	while (t_wait_timer.wait_for(std::chrono::seconds(pause))) {
+		if (!ttyclock.running)
+			break;
 		LOG("tts is %d.\n", tts_events.size());
 		if (!tts_events.empty()) {
 			std::string memo = take(tts_events);
@@ -1012,8 +1015,6 @@ void tts_run() {
 					}
 				}
 			}
-		}
-		while (t_wait_timer.wait_for(std::chrono::seconds(2))) {
 		}
 	}
 
