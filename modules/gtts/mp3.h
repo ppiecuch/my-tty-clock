@@ -38,7 +38,7 @@ struct mad_player_t {
 	mad_player_t(FILE *f = stderr) :
 			log(f) {
 		fprintf(f, "Player created (ver. %d):\n", ap_version());
-		fprintf(f, "  status: %s\n", get_string<AP_STATUS_MAX>(ap_get_status, sid).c_str());
+		fprintf(f, "  status: %s\n", get_string<AP_STATUS_MAX>(ap_get_status, session).c_str());
 		fprintf(f, "  volume: %s\n", get<float>(&ap_get_volume, session).c_str());
 		fprintf(f, "  speed: %s\n", get<float>(&ap_get_speed, session).c_str());
 	}
