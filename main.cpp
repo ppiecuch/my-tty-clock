@@ -1003,9 +1003,9 @@ void tts_run() {
 				} else {
 					std::string url = _tts + escape(memo) + _lang_opt + "es" + _client;
 					std::vector<const char *> hdrs{ _ref.c_str(), _agent.c_str(), 0 };
+					LOG("Downloading sample: %s\n", url.c_str());
 					if (!par_easycurl_to_file_ex(url.c_str(), mp3.c_str(), hdrs.data(), flog)) {
 						LOG("Download failed\n");
-						LOG("  url: %s\n", url.c_str());
 					}
 					if (!file_exists(mp3) || !is_mp3(mp3)) {
 						LOG("Cannot play %s\n", mp3.c_str());
