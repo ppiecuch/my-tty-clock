@@ -998,7 +998,7 @@ void tts_run() {
 				std::string asc = trunc_wstring(simplifieDiacritics(res));
 				LOG("Processing memo %s in tts.\n", asc.c_str());
 				std::string mp3 = "tts-cache/" + asc + ".mp3";
-				if (file_exists(mp3) && !is_mp3(mp3)) {
+				if (file_exists(mp3) && is_mp3(mp3)) {
 					touch(mp3.c_str());
 				} else {
 					std::string url = _tts + escape(memo) + _lang_opt + "es" + _client;
