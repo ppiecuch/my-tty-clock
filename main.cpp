@@ -968,7 +968,7 @@ bool is_mp3(const std::string &filename) {
 	FILEW file(filename.c_str(), "rb");
 	if (!file)
 		return false;
-	unsigned char buffer[3];
+	unsigned char buffer[3] = { 0, 0, 0 };
 	fread(buffer, 1, 3, file);
 	return (buffer[0] == 'I' && buffer[1] == 'D' && buffer[2] == '3') || (buffer[0] == 0xFF && (buffer[1] & 0xE0) == 0xE0);
 }
@@ -1004,11 +1004,11 @@ void tts_run() {
 					std::string url = _tts + escape(memo) + _lang_opt + "es" + _client;
 					std::vector<const char *> hdrs{ _ref.c_str(), _agent.c_str(), 0 };
 					if (!par_easycurl_to_file_ex(url.c_str(), mp3.c_str(), hdrs.data(), flog)) {
-						LOG("download failed\n");
-						LOG("url: %s\n", url.c_str());
+						LOG("Download failed\n");
+						LOG("  url: %s\n", url.c_str());
 					}
-					if (!file_exists(mp3)) {
-						LOG("sound file not found\n");
+					if (!file_exists(mp3) || !is_mp3(mp3)) {
+						LOG("Cannot play %s\n", mp3.c_str());
 					} else {
 						player.play(mp3.c_str()); // play mp3
 					}
