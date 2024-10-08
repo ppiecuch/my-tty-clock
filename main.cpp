@@ -984,7 +984,7 @@ void cron_run() {
 			INFO("Waiting for %d sec.\n", pause);
 		else
 			pause = 1;
-	} while (c_wait_timer.wait_for(std::chrono::seconds(pause));
+	} while (c_wait_timer.wait_for(std::chrono::seconds(pause)));
 
 	INFO("Internal cron ended - pending %ld tasks.\n", cron_events.size());
 }
