@@ -786,9 +786,9 @@ static std::string trim(std::string s) { return trimL(trimR(s)); }
 
 extern "C" char **environ;
 
-int run_cmd(char *const *args) {
+int run_cmd(const char *cmd, char *const *args) {
 	pid_t pid;
-	int status = posix_spawn(&pid, args[0], nullptr, nullptr, args, environ);
+	int status = posix_spawnp(&pid, cmd, nullptr, nullptr, args, environ);
 	if (status == 0) {
 		if (waitpid(pid, &status, 0) != -1) {
 			if (WIFEXITED(status)) {

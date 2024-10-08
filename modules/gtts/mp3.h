@@ -10,14 +10,14 @@
 
 #include <stdio.h>
 
-static char _cmd_player[] = "mpg321";
+static const char _cmd_player[] = "mpg321";
 
 struct mad_player_t {
 	FILE *log;
 
-	int (*spawn)(char *const *);
+	int (*spawn)(const char *, char *const *);
 
-	mad_player_t(int (*proc)(char *const *), FILE *f = stderr) :
+	mad_player_t(int (*proc)(const char *, char *const *), FILE *f = stderr) :
 			log(f), spawn(proc) {
 		fprintf(f, "Player created.\n");
 	}
@@ -26,7 +26,7 @@ struct mad_player_t {
 	}
 
 	void play(const char *filename) {
-		char *const args[] = { _cmd_player, 0 };
-		spawn(args);
+		char *const args[] = { _cmd_player, filename, 0 };
+		spawn(_cmd_player, args);
 	}
 };
