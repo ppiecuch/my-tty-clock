@@ -239,6 +239,7 @@ int par_easycurl_to_file_ex(char const* srcurl, char const* dstpath, const char 
     curl_easy_perform(handle);
     curl_easy_getinfo(handle, CURLINFO_CONDITION_UNMET, &code);
     curl_easy_getinfo(handle, CURLINFO_RESPONSE_CODE, &status);
+    fprintf(f, "curl: %ld %ld.\n", code, status);
     fclose(filehandle);
     if (status == 304 || status >= 400) {
         remove(dstpath);

@@ -814,18 +814,13 @@ int run_cmd(char *const *args) {
 
 bool exec_cmd(const char *cmd, char *result, int result_size) {
 	FILE *fp = popen(cmd, "r");
-
 	if (fgets(result, result_size - 1, fp) == 0) {
 		pclose(fp);
 		return false;
 	}
-
-	size_t len = strlen(result);
-
-	if (result[len - 1] < ' ') {
+	const size_t len = strlen(result);
+	if (result[len - 1] < ' ')
 		result[len - 1] = '\0';
-	}
-
 	pclose(fp);
 	return true;
 }
