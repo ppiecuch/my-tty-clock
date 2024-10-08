@@ -10,7 +10,7 @@
 
 #include <stdio.h>
 
-const char *_cmd_player = "mpg321";
+static char _cmd_player[] = "mpg321";
 
 struct mad_player_t {
 	FILE *log;
