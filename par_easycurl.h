@@ -235,8 +235,6 @@ int par_easycurl_to_file_ex(char const* srcurl, char const* dstpath, const char 
         }
     }
     curl_easy_setopt(handle, CURLOPT_HTTPHEADER, hdrs_list);
-    if (hdrs_list)
-        curl_slist_free_all(hdrs_list);
     curl_easy_setopt(handle, CURLOPT_TIMEOUT, 60);
     curl_easy_perform(handle);
     curl_easy_getinfo(handle, CURLINFO_CONDITION_UNMET, &code);
@@ -247,6 +245,8 @@ int par_easycurl_to_file_ex(char const* srcurl, char const* dstpath, const char 
         return 0;
     }
     curl_easy_cleanup(handle);
+    if (hdrs_list)
+        curl_slist_free_all(hdrs_list);
     return 1;
 }
 
