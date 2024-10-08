@@ -978,7 +978,7 @@ void cron_run() {
 		}
 
 		if (pause > 0)
-			LOG("Waiting for %d sec.\n", pause);
+			INFO("Waiting for %d sec.\n", pause);
 		else
 			pause = 1;
 	} while (c_wait_timer.wait_for(std::chrono::seconds(pause));
