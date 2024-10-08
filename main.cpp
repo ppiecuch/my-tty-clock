@@ -967,7 +967,7 @@ void cron_run() {
 
 			char buffer[80];
 			strftime(buffer, 80, "%Y/%m/%d %H:%M:%S", localtime(&rawtime));
-			std::cout << "The job \"" << c.expression() << "\" lanched at: " << rawtime << " (" << buffer << "), in " << schedule << " sec. - \"" << crontab[i] << "\"" << std::endl;
+			LOG("The job \"%s\" lanched at: %ld (%s), in %d sec. - \"%s\%", c.expression().c_str(), rawtime, buffer, schedule, crontab[i]);
 
 			if (!pause || schedule < pause) {
 				pause = schedule;
@@ -978,7 +978,7 @@ void cron_run() {
 		}
 
 		if (pause > 0)
-			std::cout << "Waiting for " << pause << " sec." << std::endl;
+			LOG("Waiting for %d sec.\n", pause);
 		else
 			pause = 1;
 	} while (c_wait_timer.wait_for(std::chrono::seconds(pause));
