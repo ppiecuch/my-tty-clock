@@ -15,9 +15,9 @@ const char *_cmd_player = "mpg321";
 struct mad_player_t {
 	FILE *log;
 
-	int (*spawn)(const *char *cmd);
+	int (*spawn)(char *const *);
 
-	mad_player_t(int (*proc)(const *char *cmd), FILE *f = stderr) :
+	mad_player_t(int (*proc)(char *const *), FILE *f = stderr) :
 			log(f), spawn(proc) {
 		fprintf(f, "Player created.\n");
 	}
@@ -26,7 +26,7 @@ struct mad_player_t {
 	}
 
 	void play(const char *filename) {
-		char *args[] = { _cmd_player, 0 };
+		const char *args[] = { _cmd_player, 0 };
 		spawn(args);
 	}
 };
