@@ -59,6 +59,10 @@ int main(int argc, char *argv[]) {
 
 /// GTTS
 
+static std::string quote(const std::string &text) {
+	return "'" + text + "'";
+}
+
 GoogleTTS::GoogleTTS(std::string msg, std::string lang, std::string speed) {
 	_speed += speed;
 	_lang += lang;
@@ -122,7 +126,7 @@ void GoogleTTS::replace(std::string &text) {
 
 void GoogleTTS::parse() {
 	replace(_text);
-	std::string cmd = _curl + "'" + _tts + _text + _lang + _client + "' -H" + _ref + "-H" + _agent + _out + " 2>/dev/null";
+	std::string cmd = _curl + "'" + _tts + _text + _lang + _client + "' -H " + quote(_ref) + " -H " + quote(_agent) + _out + " 2>/dev/null";
 	_cmds.push_back(cmd);
 }
 
@@ -131,7 +135,7 @@ void GoogleTTS::parse(std::vector<std::string> &vec) {
 	int i = 0;
 	for (std::string msg : vec) {
 		replace(msg);
-		cmd = _curl + "'" + _tts + msg + _lang + _client + "' -H" + _ref + "-H" + _agent + _outv + std::to_string(i) + ".mp3" + " 2>/dev/null";
+		cmd = _curl + "'" + _tts + msg + _lang + _client + "' -H " + quote(_ref) + " -H " + quote(_agent) + _outv + std::to_string(i) + ".mp3" + " 2>/dev/null";
 		_cmds.push_back(cmd);
 		i++;
 	}

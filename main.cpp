@@ -958,7 +958,7 @@ void cron_run() {
 
 static std::vector<std::string> tts_events;
 
-bool is_mp3(const std::string &filename) {
+static bool is_mp3(const std::string &filename) {
 	FILEW file(filename.c_str(), "rb");
 	if (!file)
 		return false;
@@ -967,13 +967,17 @@ bool is_mp3(const std::string &filename) {
 	return (buffer[0] == 'I' && buffer[1] == 'D' && buffer[2] == '3') || (buffer[0] == 0xFF && (buffer[1] & 0xE0) == 0xE0);
 }
 
-std::string escape(std::string text) {
+static std::string escape(std::string text) {
 	size_t start_pos = 0;
 	while ((start_pos = text.find(" ", start_pos)) != std::string::npos) {
 		text.replace(start_pos, 1, "%20");
 		start_pos += 3; // Handles case where 'to' is a substring of 'from'
 	}
 	return text;
+}
+
+static std::string quote(const std::string &text) {
+	return "'" + text + "'";
 }
 
 void tts_run() {

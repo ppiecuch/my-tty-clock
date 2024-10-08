@@ -56,7 +56,7 @@ int par_easycurl_to_file(char const* srcurl, char const* dstpath);
 #include <strings.h>
 #endif
 
-static int _ready = 0;
+static int _ready = 0, _verbose = 0;
 
 void par_easycurl_init(unsigned int flags)
 {
@@ -225,8 +225,10 @@ int par_easycurl_to_file_ex(char const* srcurl, char const* dstpath, const char 
     curl_easy_setopt(handle, CURLOPT_FAILONERROR, 1);
     curl_easy_setopt(handle, CURLOPT_WRITEDATA, filehandle);
     curl_easy_setopt(handle, CURLOPT_HEADERFUNCTION, onheader);
-    curl_easy_setopt(handle, CURLOPT_STDERR, f);
-    curl_easy_setopt(handle, CURLOPT_VERBOSE, 1);
+    if (_verbose) {
+        curl_easy_setopt(handle, CURLOPT_STDERR, f);
+        curl_easy_setopt(handle, CURLOPT_VERBOSE, 1);
+    }
     curl_easy_setopt(handle, CURLOPT_URL, srcurl);
     curl_easy_setopt(handle, CURLOPT_TIMECONDITION, CURL_TIMECOND_IFMODSINCE);
     curl_easy_setopt(handle, CURLOPT_TIMEVALUE, 0);
@@ -241,7 +243,6 @@ int par_easycurl_to_file_ex(char const* srcurl, char const* dstpath, const char 
     curl_easy_perform(handle);
     curl_easy_getinfo(handle, CURLINFO_CONDITION_UNMET, &code);
     curl_easy_getinfo(handle, CURLINFO_RESPONSE_CODE, &status);
-    fprintf(f, "curl: %ld %ld.\n", code, status);
     fclose(filehandle);
     if (status == 304 || status >= 400) {
         remove(dstpath);
