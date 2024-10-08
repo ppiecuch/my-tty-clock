@@ -225,6 +225,8 @@ int par_easycurl_to_file_ex(char const* srcurl, char const* dstpath, const char 
     curl_easy_setopt(handle, CURLOPT_FAILONERROR, 1);
     curl_easy_setopt(handle, CURLOPT_WRITEDATA, filehandle);
     curl_easy_setopt(handle, CURLOPT_HEADERFUNCTION, onheader);
+    curl_easy_setopt(handle, CURLOPT_STDERR, f);
+    curl_easy_setopt(handle, CURLOPT_VERBOSE, 1);
     curl_easy_setopt(handle, CURLOPT_URL, srcurl);
     curl_easy_setopt(handle, CURLOPT_TIMECONDITION, CURL_TIMECOND_IFMODSINCE);
     curl_easy_setopt(handle, CURLOPT_TIMEVALUE, 0);
