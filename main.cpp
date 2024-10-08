@@ -23,6 +23,7 @@
 #include <time.h>
 #include <unistd.h>
 
+#include "datetime/datetime.h"
 #include "gtts/gtts.h"
 #include "gtts/mp3.h"
 #include "main.h"
@@ -938,6 +939,8 @@ struct task_t {
 };
 
 static std::vector<task_t> cron_events;
+
+using namespace datetime_utils::crontab;
 
 void cron_run() {
 	std::vector<std::string> crontab = {
