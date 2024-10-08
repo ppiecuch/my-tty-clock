@@ -1271,13 +1271,13 @@ int main(int argc, char **argv) {
 		return 0;
 	}
 
-	std::thread cron_thrd(cron_run);
-	std::thread tts_thrd(tts_run);
-
 	atexit(cleanup);
 
 	init();
 	attron(A_BLINK);
+
+	std::thread cron_thrd(cron_run);
+	std::thread tts_thrd(tts_run);
 
 	/* Create status win */
 	WINDOW *status = newwin(1, COLS, LINES - 1, 0);
