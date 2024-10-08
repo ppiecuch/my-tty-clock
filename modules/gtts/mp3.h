@@ -22,11 +22,13 @@ struct mad_player_t {
 	struct mad_frame mad_frame;
 	struct mad_synth mad_synth;
 
-	mad_player_t() {
+	FILE *log;
+
+	mad_player_t(FILE *f = stderr) {
 		// Set up PulseAudio 16-bit 44.1kHz stereo output
 		static const pa_sample_spec ss = { .format = PA_SAMPLE_S16LE, .rate = 44100, .channels = 2 };
 		if (!(device = pa_simple_new(nullptr, "MP3 player", PA_STREAM_PLAYBACK, nullptr, "playback", &ss, nullptr, nullptr, &error))) {
-			printf("pa_simple_new() failed\n");
+			fprintf(log, "pa_simple_new() failed\n");
 			return;
 		}
 		// Initialize MAD library
@@ -52,7 +54,7 @@ struct mad_player_t {
 
 	int play(const char *filename) {
 		if (!init) {
-			printf("System not initialized.\n");
+			fprintf(log, "System not initialized.\n");
 			return EXIT_FAILURE;
 		}
 		// File pointer
@@ -61,9 +63,9 @@ struct mad_player_t {
 		// Fetch file size, etc
 		struct stat metadata;
 		if (fstat(fd, &metadata) >= 0) {
-			printf("File size %d bytes\n", (int)metadata.st_size);
+			fprintf(log, "File size %d bytes\n", (int)metadata.st_size);
 		} else {
-			printf("Failed to stat %s\n", filename);
+			fprintf(log, "Failed to stat %s\n", filename);
 			fclose(fp);
 			return EXIT_FAILURE;
 		}
@@ -112,11 +114,11 @@ struct mad_player_t {
 				stream[(pcm->length - nsamples) * 4 + 3] = ((sample >> 8) & 0xff);
 			}
 			if (pa_simple_write(device, stream, (size_t)1152 * 4, &error) < 0) {
-				fprintf(stderr, "pa_simple_write() failed: %s\n", pa_strerror(error));
+				fprintf(log, "pa_simple_write() failed: %s\n", pa_strerror(error));
 				return;
 			}
 		} else {
-			printf("Mono not supported!");
+			fprintf(log, "Mono not supported!");
 		}
 	}
 };
