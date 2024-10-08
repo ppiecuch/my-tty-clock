@@ -948,15 +948,18 @@ void cron_run() {
 
 	INFO("Internal cron started with %ld entries.\n", crontab.size());
 
-	while (ttyclock.running) {
+	unsigned pause;
+	std::vector<task_t> tasks;
+	do {
 		if (!ttyclock.running)
 			break;
 
+		for (const task_t &t : tasks) {
+		}
+
 		time_t Now(time(nullptr));
 
-		unsigned pause = 0;
-		task_t task;
-
+		tasks.clear(), pause = 0;
 		for (int i = 0; i < crontab.size(); i++) {
 			cron c = crontab[i];
 			time_t rawtime = c.next_date(Now);
@@ -968,20 +971,17 @@ void cron_run() {
 
 			if (!pause || schedule < pause) {
 				pause = schedule;
-				task = { rawtime, c.expression() };
+				tasks.assign({ { rawtime, c.expression() } });
+			} else if (schedule == pause) {
+				tasks.push_back({ rawtime, c.expression() });
 			}
 		}
 
-		if (pause > 0) {
+		if (pause > 0)
 			std::cout << "Waiting for " << pause << " sec." << std::endl;
-			while (c_wait_timer.wait_for(std::chrono::seconds(pause))) {
-				std::cout << "Executing." << std::endl;
-				cron_events.push_back(task);
-				break;
-			}
-		} else
-			sleep(1);
-	}
+		else
+			pause = 1;
+	} while (c_wait_timer.wait_for(std::chrono::seconds(pause));
 
 	INFO("Internal cron ended - pending %ld tasks.\n", cron_events.size());
 }
