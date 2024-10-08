@@ -18,9 +18,9 @@ struct mad_player_t {
 	mad_player_t(FILE *f = stderr) :
 			log(f) {
 		fprintf(f, "Player created (ver. %d):", ap_version());
-		auto get_volume = []() { float v; ap_get_volume(session, &v); return v; };
+		auto get_volume = [session]() { float v; ap_get_volume(session, &v); return v; };
 		fprintf(f, "  volume: %0.2f\n", get_volume());
-		auto get_speed = []() { float v; ap_get_speed(session, &v); return v; };
+		auto get_speed = [session]() { float v; ap_get_speed(session, &v); return v; };
 		fprintf(f, "  speed: %0.2f\n", get_speed());
 	}
 
