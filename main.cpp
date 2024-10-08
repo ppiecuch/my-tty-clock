@@ -11,7 +11,6 @@
 #include <sys/prctl.h>
 #endif
 #include <linux/vt.h>
-#include <mad.h>
 #include <spawn.h>
 #include <sys/file.h>
 #include <sys/ioctl.h>
