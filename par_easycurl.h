@@ -206,13 +206,15 @@ int par_easycurl_to_file(char const* srcurl, char const* dstpath)
     return 1;
 }
 
-int par_easycurl_to_file_ex(char const* srcurl, char const* dstpath, const char **hdrs)
+int par_easycurl_to_file_ex(char const* srcurl, char const* dstpath, const char **hdrs, FILE *f)
 {
     long code = 0;
     long status = 0;
+    if (!f)
+        f = stderr;
     FILE* filehandle = fopen(dstpath, "wb");
     if (!filehandle) {
-        fprintf(stderr, "Unable to open %s for writing.\n", dstpath);
+        fprintf(f, "Unable to open %s for writing.\n", dstpath);
         return 0;
     }
     CURL* handle = curl_easy_init();
