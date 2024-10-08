@@ -959,7 +959,7 @@ void cron_run() {
 		}
 	}
 
-	printf("Internal cron ended - pending %ld tasks.\n", cron_events.size());
+	INFO("Internal cron ended - pending %ld tasks.\n", cron_events.size());
 }
 
 static std::vector<std::string> tts_events;
