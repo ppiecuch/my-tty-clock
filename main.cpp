@@ -89,10 +89,10 @@ static FILEW flog("echo.log", "w");
 	}
 
 #define INFO(fmt, ...)                                     \
-	{                                                      \
+	do {                                                   \
 		fprintf(flog, "[words-memo] " fmt, ##__VA_ARGS__); \
 		fflush(flog);                                      \
-	}
+	} while (0)
 
 #define ERROR(fmt, ...)                                    \
 	{                                                      \
