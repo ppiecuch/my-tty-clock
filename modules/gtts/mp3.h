@@ -19,7 +19,7 @@ struct mad_player_t {
 
 	mad_player_t(int (*proc)(const char *, char *const *), FILE *f = stderr) :
 			log(f), spawn(proc) {
-		fprintf(f, "Player created.\n");
+		fprintf(f, "Player created (with '%s').\n", _cmd_player);
 	}
 
 	~mad_player_t() {
