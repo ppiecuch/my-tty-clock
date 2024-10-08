@@ -988,6 +988,7 @@ void tts_run() {
 	mad_player_t player(flog);
 
 	while (ttyclock.running) {
+		LOG("tts is %d.\n", tts_events.size());
 		if (!tts_events.empty()) {
 			std::string memo = take(tts_events);
 			std::wstring res;
