@@ -985,7 +985,7 @@ std::string escape(std::string text) {
 void tts_run() {
 	INFO("TTS module started.\n");
 
-	mad_player_t player;
+	mad_player_t player(flog);
 
 	while (ttyclock.running) {
 		if (!tts_events.empty()) {
