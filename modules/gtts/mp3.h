@@ -11,6 +11,7 @@
 #include <stdio.h>
 
 static const char _cmd_player[] = "mpg321";
+static const char _cmd_opts[] = "-q";
 
 struct mad_player_t {
 	FILE *log;
@@ -26,7 +27,7 @@ struct mad_player_t {
 	}
 
 	void play(const char *filename) {
-		char *const args[] = { const_cast<char *>(_cmd_player), const_cast<char *>(filename), 0 };
+		char *const args[] = { const_cast<char *>(_cmd_player), const_cast<char *>(_cmd_opts), const_cast<char *>(filename), 0 };
 		spawn(_cmd_player, args);
 	}
 };
