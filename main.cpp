@@ -970,7 +970,7 @@ void cron_run() {
 
 			char buffer[80];
 			strftime(buffer, 80, "%Y/%m/%d %H:%M:%S", localtime(&rawtime));
-			LOG("The job \"%s\" lanched at: %ld (%s), in %d sec. - \"%s\%\n", c.expression().c_str(), rawtime, buffer, schedule, crontab[i]);
+			LOG("The job \"%s\" lanched at: %ld (%s), in %d sec. - \"%s\"\n", c.expression().c_str(), rawtime, buffer, schedule, crontab[i].c_str());
 
 			if (!pause || schedule < pause) {
 				pause = schedule;
