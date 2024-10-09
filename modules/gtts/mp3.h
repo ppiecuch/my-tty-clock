@@ -10,8 +10,8 @@
 
 #include <stdio.h>
 
-static const char _cmd_player[] = "mpg321";
-static const char _cmd_quiet[] = "-q";
+static const char *_cmd_player = "mpg321";
+static const char *_cmd_quiet = "-q";
 
 struct mad_player_t {
 	FILE *log;
