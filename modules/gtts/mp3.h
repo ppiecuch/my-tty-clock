@@ -29,13 +29,7 @@ struct mad_player_t {
 		args.push_back(filename);
 		args.push_back(0);
 
-		if (quiet) {
-			char *const args[] = { const_cast<char *>(_cmd_player), const_cast<char *>(_cmd_quiet), const_cast<char *>(filename), 0 };
-			spawn(_cmd_player, args);
-		} else {
-			char *const args[] = { const_cast<char *>(_cmd_player), const_cast<char *>(filename), 0 };
-			spawn(_cmd_player, args);
-		}
+		spawn(_cmd_player, args.data());
 	}
 
 	mad_player_t(int (*proc)(const char *, char *const *), FILE *f = stderr) :
