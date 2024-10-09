@@ -20,13 +20,9 @@ struct mad_player_t {
 	int (*spawn)(const char *, char *const *);
 
 	void play(const char *filename) {
-		char *const args[] = {
-			const_cast<char *>(_cmd_player),
-			quiet ? const_cast<char *>(_cmd_quiet) : const_cast<char *>(filename),
-			quiet ? const_cast<char *>(filename) : 0,
-			0
-		};
-		spawn(_cmd_player, args);
+		char *const args1[] = { const_cast<char *>(_cmd_player), const_cast<char *>(filename), 0 };
+		char *const args2[] = { const_cast<char *>(_cmd_player), const_cast<char *>(_cmd_quiet), const_cast<char *>(filename), 0 };
+		spawn(_cmd_player, quiet ? args2 : args1);
 	}
 
 	mad_player_t(int (*proc)(const char *, char *const *), FILE *f = stderr) :
