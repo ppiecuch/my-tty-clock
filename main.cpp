@@ -82,11 +82,13 @@ int fflush(FILEW &f) { return f.flush(); }
 static bool verbose = false;
 static FILEW flog("echo.log", "w");
 
-#define LOG(fmt, ...)                                      \
-	if (verbose) {                                         \
-		fprintf(flog, "[words-memo] " fmt, ##__VA_ARGS__); \
-		fflush(flog);                                      \
-	}
+#define LOG(fmt, ...)                                          \
+	do {                                                       \
+		if (verbose) {                                         \
+			fprintf(flog, "[words-memo] " fmt, ##__VA_ARGS__); \
+			fflush(flog);                                      \
+		}                                                      \
+	} while (0)
 
 #define INFO(fmt, ...)                                     \
 	do {                                                   \
