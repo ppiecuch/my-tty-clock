@@ -1036,18 +1036,17 @@ void tts_run() {
 				std::string mp3 = "tts-cache/" + asc + ".mp3";
 				if (file_exists(mp3) && is_mp3(mp3)) {
 					touch(mp3.c_str());
+					player.play(mp3.c_str()); // play mp3
 				} else {
 					std::string url = _tts + escape(memo) + _lang_opt + "es" + _client;
 					std::vector<const char *> hdrs{ _ref.c_str(), _agent.c_str(), 0 };
 					LOG("Downloading sample \"%s\"\n", url.c_str());
-					if (!par_easycurl_to_file_ex(url.c_str(), mp3.c_str(), hdrs.data(), flog)) {
+					if (!par_easycurl_to_file_ex(url.c_str(), mp3.c_str(), hdrs.data(), flog))
 						LOG("  download failed.\n");
-					}
-				}
-				if (!file_exists(mp3) || !is_mp3(mp3)) {
-					LOG("Cannot play sound file \"%s\"\n", mp3.c_str());
-				} else {
-					player.play(mp3.c_str()); // play mp3
+					if (!file_exists(mp3) || !is_mp3(mp3))
+						LOG("Cannot play sound file \"%s\"\n", mp3.c_str());
+					else
+						player.play(mp3.c_str()); // play mp3
 				}
 			}
 		}
