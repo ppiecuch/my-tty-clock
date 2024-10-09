@@ -789,7 +789,12 @@ extern "C" char **environ;
 
 int run_cmd(const char *cmd, char *const *args) {
 	pid_t pid;
-	int status = posix_spawnp(&pid, cmd, nullptr, nullptr, args, environ);
+
+	posix_spawn_file_actions_t action;
+	posix_spawn_file_actions_init(&action);
+	posix_spawn_file_actions_addopen(&action, STDOUT_FILENO, "exec.log", O_WRONLY | O_APPEND, 0);
+
+	int status = posix_spawnp(&pid, cmd, &action, nullptr, args, environ);
 	if (status == 0) {
 		if (waitpid(pid, &status, 0) != -1) {
 			if (WIFEXITED(status)) {
@@ -805,10 +810,10 @@ int run_cmd(const char *cmd, char *const *args) {
 				}
 			}
 		} else {
-			LOG("waitpid error\n");
+			LOG("Running %s: waitpid error\n", cmd);
 		}
 	} else {
-		LOG("posix_spawn status: %s\n", strerror(status));
+		LOG("Running %s: posix_spawn error status: %s\n", cmd, strerror(status));
 	}
 	return -1;
 }
