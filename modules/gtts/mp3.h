@@ -13,8 +13,6 @@
 static const char _cmd_player[] = "mpg321";
 static const char _cmd_quiet[] = "-q";
 
-#include <vector>
-
 struct mad_player_t {
 	FILE *log;
 	bool quiet = false;
@@ -22,14 +20,13 @@ struct mad_player_t {
 	int (*spawn)(const char *, char *const *);
 
 	void play(const char *filename) {
-		std::vector<char *> args;
-		args.push_back(_cmd_player);
-		if (quiet)
-			args.push_back(_cmd_quiet);
-		args.push_back(filename);
-		args.push_back(0);
-
-		spawn(_cmd_player, args.data());
+		char *const args[] = {
+			const_cast<char *>(_cmd_player),
+			quiet ? const_cast<char *>(_cmd_quiet) : const_cast<char *>(filename),
+			quiet ? const_cast<char *>(filename) : 0,
+			0
+		};
+		spawn(_cmd_player, args);
 	}
 
 	mad_player_t(int (*proc)(const char *, char *const *), FILE *f = stderr) :
