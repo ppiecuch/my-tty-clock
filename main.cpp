@@ -1032,22 +1032,22 @@ void tts_run() {
 			std::wstring res;
 			if (ConvertUTF8toWide(memo.c_str(), res)) {
 				std::string asc = trunc_wstring(simplifieDiacritics(res));
-				LOG("Processing memo %s in tts.\n", asc.c_str());
+				LOG("Processing memo \"%s\" in tts.\n", asc.c_str());
 				std::string mp3 = "tts-cache/" + asc + ".mp3";
 				if (file_exists(mp3) && is_mp3(mp3)) {
 					touch(mp3.c_str());
 				} else {
 					std::string url = _tts + escape(memo) + _lang_opt + "es" + _client;
 					std::vector<const char *> hdrs{ _ref.c_str(), _agent.c_str(), 0 };
-					LOG("Downloading sample: %s\n", url.c_str());
+					LOG("Downloading sample \"%s\"\n", url.c_str());
 					if (!par_easycurl_to_file_ex(url.c_str(), mp3.c_str(), hdrs.data(), flog)) {
-						LOG("Download failed\n");
+						LOG("  download failed.\n");
 					}
-					if (!file_exists(mp3) || !is_mp3(mp3)) {
-						LOG("Cannot play %s\n", mp3.c_str());
-					} else {
-						player.play(mp3.c_str()); // play mp3
-					}
+				}
+				if (!file_exists(mp3) || !is_mp3(mp3)) {
+					LOG("Cannot play sound file \"%s\"\n", mp3.c_str());
+				} else {
+					player.play(mp3.c_str()); // play mp3
 				}
 			}
 		}
