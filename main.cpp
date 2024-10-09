@@ -1406,11 +1406,11 @@ int main(int argc, char **argv) {
 
 	endwin();
 
-	flog.close();
-
 	// clean up
 	c_wait_timer.interrupt(), t_wait_timer.interrupt();
 	cron_thrd.join(), tts_thrd.join();
+
+	flog.close();
 
 	return 0;
 }
