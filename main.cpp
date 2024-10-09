@@ -795,6 +795,7 @@ int run_cmd(const char *cmd, char *const *args) {
 	posix_spawn_file_actions_t action;
 	posix_spawn_file_actions_init(&action);
 	posix_spawn_file_actions_addopen(&action, STDOUT_FILENO, "exec.log", O_WRONLY | O_APPEND, 0);
+	posix_spawn_file_actions_addopen(&action, STDERR_FILENO, "exec.log", O_WRONLY | O_APPEND, 0);
 
 	touch("exec.log");
 
